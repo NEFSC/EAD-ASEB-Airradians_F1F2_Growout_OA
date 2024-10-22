@@ -1,0 +1,8 @@
+"","Date","Age","Metric","model","ShapiroWilk","ResidNorm","Variance","HomogVar","DF.num","DF.denom","Tstat","P_val","SigDif","Bonferroni_cor"
+"1","9/14/2021",50,"RR; LENGTH b factor normalized","Welchs T test, equal variance",0.580167657561131,"YES",0.915757067602388,"YES","6","NA",0.919905348170294,0.393103642734731,"NO",1
+"2","9/30/2021",66,"RR; LENGTH b factor normalized","Welchs T test, equal variance",0.569374448803486,"YES",0.308898250935243,"YES","6","NA",-1.27167352761534,0.250555869234975,"NO",1
+"3","10/26/2021",92,"RR; LENGTH b factor normalized","Welchs T test, non-equal variance",0.194151531179382,"YES",0.0218993245777388,"NO","3.21665912788361","NA",-1.69140437207848,0.183157030376244,"NO",1
+"4","2/2/2022",191,"RR; LENGTH b factor normalized","Welchs T test, equal variance",0.307515533989642,"YES",0.928043572522415,"YES","14","NA",-0.0545660320327145,0.957255239694472,"NO",1
+"5","3/1/2022",218,"RR; LENGTH b factor normalized","Welchs T test, equal variance",0.99990605357802,"YES",0.772408689171382,"YES","14","NA",-2.67651293390525,0.018068343943629,"YES",0.126478407605403
+"6","9/22/2022",423,"RR; LENGTH b factor normalized","Welchs T test, equal variance",0.159084754227643,"YES",0.648317731928364,"YES","6","NA",-1.87637900054768,0.109704359580545,"NO",0.767930517063813
+"7","10/26/2022",457,"RR; LENGTH b factor normalized","Wilcoxon rank sum exact test",0.0286217171117545,"NO",0.124620840969658,"YES","NA","NA",16,0.533799533799534,"NO",1
