@@ -10,8 +10,9 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 # SET WORKING DIRECTORY 
+
 # knitr::opts_knit$set(root.dir = "C:/Users/katherine.mcfarland/Documents/GitHub/EAD-ASEB-Airradians_multigen_OA/larvae") # Katie's
-knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_Larvae_crossgen_OA/RAnalysis") # Sam's
+knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis") # Sam's
 knitr::opts_knit$set(root.dir = "C:/Users/samuel.gurr/Documents/Github_repositories/EAD-ASEB-Airradians_multigen_OA/RAnalysis") # Sam's
 ```
 
@@ -55,9 +56,9 @@ Biodep_Master_F1 <- Biodep_Master_F1 %>%
                         dplyr::mutate(Gen = 'F1')
 
 Biodep_Master_F2 <- Biodep_Master_F2 %>% 
-                        dplyr::mutate(Age = case_when(Date == "20230201" ~  190, 
-                                                       Date == "20230224" ~  213, 
-                                                       Date == "20230328" ~  245)) %>% 
+                        dplyr::mutate(Age = case_when(Date == "20230201" ~  169, 
+                                                       Date == "20230224" ~  192, 
+                                                       Date == "20230328" ~  224)) %>% 
                         dplyr::mutate(pCO2 = case_when(treatment == 8 ~ "500 μatm", # add column for pCO2
                                                        treatment == 7.5 ~ "800 μatm",
                                                        treatment == 7 ~ "1200 μatm")) %>% # %>% #edit this!
@@ -461,8 +462,8 @@ F2_SE_Plot  <- F2_SE_MEANS %>%
                                      y=SE, 
                                      color=as.factor(pCO2))) +
                           geom_point(position=position_dodge(.5))+ 
-                          scale_color_manual(values=c("forestgreen",
-                                                      "darkorange2",
+                          scale_color_manual(values=c("#228B22",
+                                                      "#FFA500",
                                                       "purple3"))+
                           geom_errorbar(aes(ymin=SE-se, 
                                             ymax=SE+se), width=.2,
@@ -653,9 +654,8 @@ F2_SE_Plot  <- F2_SE_MEANS %>%
                           ggplot(aes(x=as.factor(Age), 
                                      y=SE, 
                                      color=as.factor(pCO2))) +
-                          geom_point(position=position_dodge(.5))+ 
-                          scale_color_manual(values=c("forestgreen",
-                                                      "darkorange2"))+
+                          scale_color_manual(values=c("#228B22",
+                                                      "#FFA500"))+
                           geom_errorbar(aes(ymin=SE-se, 
                                             ymax=SE+se), width=.2,
                                         position=position_dodge(.5))+
@@ -663,11 +663,13 @@ F2_SE_Plot  <- F2_SE_MEANS %>%
                           theme_classic() +  
                           xlab("Age (dpf)") +
                          #xlab("Age (d)") +
-                          theme(panel.grid.major = element_blank(), 
+                          theme(axis.text=element_text(size=10),
+                                panel.grid.major = element_blank(), 
                                 panel.grid.minor = element_blank(),
                                 legend.position = "none")+ 
                           scale_y_continuous(name ="Selection Efficiency")+
                           geom_line(stat = "identity", size=1.0)+
+                          geom_point(position=position_dodge(.5), size = 3, shape = 21, fill = "white")+ 
                           theme(text = element_text(size=10))
 
 # Orgnaic Ingestion Rate
@@ -679,9 +681,8 @@ F2_OIR_Plot  <- F2_OIR_MEANS %>%
                           ggplot(aes(x=as.factor(Age), 
                                      y=OIR, 
                                      color=as.factor(pCO2))) +
-                          geom_point(position=position_dodge(.5))+ 
-                          scale_color_manual(values=c("forestgreen",
-                                                      "darkorange2"))+
+                          scale_color_manual(values=c("#228B22",
+                                                      "#FFA500"))+
                           geom_errorbar(aes(ymin=OIR-se, 
                                             ymax=OIR+se), width=.2,
                                         position=position_dodge(.5))+
@@ -689,11 +690,13 @@ F2_OIR_Plot  <- F2_OIR_MEANS %>%
                           theme_classic() +  
                           xlab("Age (dpf)") +
                          #xlab("Age (d)") +
-                          theme(panel.grid.major = element_blank(), 
+                          theme(axis.text=element_text(size=10),
+                                panel.grid.major = element_blank(), 
                                 panel.grid.minor = element_blank(),
                                 legend.position = "none")+ 
                           scale_y_continuous(name ="Orgnaic Ingestion Rate")+
                           geom_line(stat = "identity", size=1.0)+
+                          geom_point(position=position_dodge(.5), size = 3, shape = 21, fill = "white")+ 
                           theme(text = element_text(size=10))
 
 
@@ -706,9 +709,8 @@ F2_CR_correct_Plot  <- F2_CR_correct_MEANS %>%
                           ggplot(aes(x=as.factor(Age), 
                                      y=CR_correct, 
                                      color=as.factor(pCO2))) +
-                          geom_point(position=position_dodge(.5))+ 
-                          scale_color_manual(values=c("forestgreen",
-                                                      "darkorange2"))+
+                          scale_color_manual(values=c("#228B22",
+                                                      "#FFA500"))+
                           geom_errorbar(aes(ymin=CR_correct-se, 
                                             ymax=CR_correct+se), width=.2,
                                         position=position_dodge(.5))+
@@ -716,11 +718,13 @@ F2_CR_correct_Plot  <- F2_CR_correct_MEANS %>%
                           theme_classic() +  
                           xlab("Age (dpf)") +
                          #xlab("Age (d)") +
-                          theme(panel.grid.major = element_blank(), 
+                          theme(axis.text=element_text(size=10),
+                                panel.grid.major = element_blank(), 
                                 panel.grid.minor = element_blank(),
                                 legend.position = "none")+ 
                           scale_y_continuous(name ="Clearance Rate (corrected)")+
                           geom_line(stat = "identity", size=1.0)+
+                          geom_point(position=position_dodge(.5), size = 3, shape = 21, fill = "white")+ 
                           theme(text = element_text(size=10))
 
 # Rejection Rate (corrected)
@@ -732,9 +736,8 @@ F2_RR_correct_Plot  <- F2_RR_correct_MEANS %>%
                           ggplot(aes(x=as.factor(Age), 
                                      y=RR_correct, 
                                      color=as.factor(pCO2))) +
-                          geom_point(position=position_dodge(.5))+ 
-                          scale_color_manual(values=c("forestgreen",
-                                                      "darkorange2"))+
+                          scale_color_manual(values=c("#228B22",
+                                                      "#FFA500"))+
                           geom_errorbar(aes(ymin=RR_correct-se, 
                                             ymax=RR_correct+se), width=.2,
                                         position=position_dodge(.5))+
@@ -742,11 +745,13 @@ F2_RR_correct_Plot  <- F2_RR_correct_MEANS %>%
                           theme_classic() +  
                           xlab("Age (dpf)") +
                          #xlab("Age (d)") +
-                          theme(panel.grid.major = element_blank(), 
+                          theme(axis.text=element_text(size=10),
+                                panel.grid.major = element_blank(), 
                                 panel.grid.minor = element_blank(),
                                 legend.position = "none")+  
                           scale_y_continuous(name ="Rejection Rate (corrected)")+
                           geom_line(stat = "identity", size=1.0)+
+                          geom_point(position=position_dodge(.5), size = 3, shape = 21, fill = "white")+ 
                           theme(text = element_text(size=10))
 
 # Absorption Rate 
@@ -758,9 +763,8 @@ F2_AR_Plot  <- F2_AR_MEANS %>%
                           ggplot(aes(x=as.factor(Age), 
                                      y=AR, 
                                      color=as.factor(pCO2))) +
-                          geom_point(position=position_dodge(.5))+ 
-                          scale_color_manual(values=c("forestgreen",
-                                                      "darkorange2"))+
+                          scale_color_manual(values=c("#228B22",
+                                                      "#FFA500"))+
                           geom_errorbar(aes(ymin=AR-se, 
                                             ymax=AR+se), 
                                         width=.2,
@@ -769,11 +773,13 @@ F2_AR_Plot  <- F2_AR_MEANS %>%
                           theme_classic() +  
                           xlab("Age (dpf)") +
                          #xlab("Age (d)") +
-                          theme(panel.grid.major = element_blank(), 
+                          theme(axis.text=element_text(size=10),
+                                panel.grid.major = element_blank(), 
                                 panel.grid.minor = element_blank(),
                                 legend.position = "none")+ 
                           scale_y_continuous(name ="Absorption Rate")+
                           geom_line(stat = "identity", size=1.0)+
+                          geom_point(position=position_dodge(.5), size = 3, shape = 21, fill = "white")+ 
                           theme(text = element_text(size=10))
 
 # Absorption Efficiency 
@@ -785,9 +791,8 @@ F2_AE_Plot  <- F2_AE_MEANS %>%
                           ggplot(aes(x=as.factor(Age), 
                                      y=AE, 
                                      color=as.factor(pCO2))) +
-                          geom_point(position=position_dodge(.5))+ 
-                          scale_color_manual(values=c("forestgreen",
-                                                      "darkorange2"))+
+                          scale_color_manual(values=c("#228B22",
+                                                      "#FFA500"))+
                           geom_errorbar(aes(ymin=AE-se, 
                                             ymax=AE+se), 
                                         width=.2,
@@ -796,11 +801,13 @@ F2_AE_Plot  <- F2_AE_MEANS %>%
                           theme_classic() +  
                           xlab("Age (dpf)") +
                          #xlab("Age (d)") +
-                          theme(panel.grid.major = element_blank(), 
+                          theme(axis.text=element_text(size=10),
+                                panel.grid.major = element_blank(), 
                                 panel.grid.minor = element_blank(),
                                 legend.position = "none")+ 
                           scale_y_continuous(name ="Absorption Efficiency")+
                           geom_line(stat = "identity", size=1.0)+
+                          geom_point(position=position_dodge(.5), size = 3, shape = 21, fill = "white")+ 
                           theme(text = element_text(size=10))
 
 ggpubr::ggarrange(F2_OIR_Plot,F2_RR_correct_Plot, F2_CR_correct_Plot,
@@ -809,7 +816,7 @@ ggpubr::ggarrange(F2_OIR_Plot,F2_RR_correct_Plot, F2_CR_correct_Plot,
 
 # output the plot 
 library(ggpubr)
-pdf(paste0("Output/Biodeposition/F2/F2_Biodeposition_plots_LowvMod.pdf"), width = 10, height= 6)
+pdf(paste0("Output/Biodeposition/F2/F2_Biodeposition_plots_LowvMod.pdf"), width = 9, height= 6)
 ggpubr::ggarrange(F2_OIR_Plot,F2_RR_correct_Plot, F2_CR_correct_Plot,
           F2_SE_Plot, F2_AR_Plot, F2_AE_Plot,
           ncol = 3, nrow = 2)

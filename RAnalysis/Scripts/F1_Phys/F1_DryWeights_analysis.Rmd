@@ -30,7 +30,7 @@ library(Rmisc)
 library(ggpmisc)
 library(tidyr)
 # SET WORKING DIRECTORY :::::::::::::::::::::::::::::::::::::::::::::::
-knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis")
+knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis")
 
 ```
 
@@ -65,7 +65,7 @@ F1_dryweights <- F1_dryweights[!is.na(F1_dryweights$pH),] %>% # master data file
                                                   Date_sampled == "6/29/2022" ~ 338))
 
 # View(F1_dryweights)
-
+F1_dryweights %>% filter(Age %in% 245)
 
 # View(F1_dryweights %>% dplyr::select(Date_sampled, Dry_Gonad_weight_g,pH,Tank_Replicate) %>% group_by(Date_sampled,pH,Tank_Replicate) %>% dplyr::summarise(n=n()))
 ```
@@ -285,7 +285,9 @@ Proportion_master <- F1_dryweights_calc.long %>%
                             dplyr::mutate(Proportion_Gonad    = Dry_Gonad_weight_g/Total_Dry_Tissue_g,
                                           Proportion_Adductor = Dry_Adductor_Tissue_g/Total_Dry_Tissue_g,
                                           Proportion_Somatic  = Dry_Somatic_Tissue_g/Total_Dry_Tissue_g,
-                                          Sanity_check_prop_total = (Proportion_Gonad +  Proportion_Adductor + Proportion_Somatic)) 
+                                          Sanity_check_prop_total = (Proportion_Gonad +  
+                                                                      Proportion_Adductor + 
+                                                                       Proportion_Somatic)) 
 
 ```
 
