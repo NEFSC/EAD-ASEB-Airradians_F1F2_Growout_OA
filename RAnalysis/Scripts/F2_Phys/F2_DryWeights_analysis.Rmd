@@ -28,6 +28,9 @@ library(ggpubr)
 library(SciViews)
 library(Rmisc)
 library(ggpmisc)
+library(purrr)
+library(rstatix)
+library(lsr)
 
 # SET WORKING DIRECTORY :::::::::::::::::::::::::::::::::::::::::::::::
 knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis")
@@ -564,8 +567,6 @@ dev.off()
 
 ### Statistics on proportion data
 ```{r Proportion stats}
-library(purrr)
-library(rstatix)
 
 # Gonad (to total tissue)
 F2_Proportion_Gonad_MEANS <- Proportion_master %>% 
@@ -586,6 +587,8 @@ F2_Proportion_Gonad_MEANS %>% summarySE(measurevar="Proportion_Gonad",
 F2_Proportion_Gonad_MEANS$DPvar    <- F2_Proportion_Gonad_MEANS$Proportion_Gonad
 F2_Proportion_Gonad_MEANS$INDvar   <- F2_Proportion_Gonad_MEANS$pCO2
 F2_Proportion_Gonad_MEANS$GROUPvar <- F2_Proportion_Gonad_MEANS$Age
+
+
 
 ProportionGonad_stats <- as.data.frame(runstats(F2_Proportion_Gonad_MEANS)) # sig effect on Age 196 and 220
 ProportionGonad_ttest <- as.data.frame(run_ttest(F2_Proportion_Gonad_MEANS %>% 
@@ -694,6 +697,8 @@ ProportionTissues_Ttest <- rbind(ProportionGonad_ttest, ProportionAdductor_ttest
 write.csv(ProportionTissues_Ttest, "Output/DryWeights/F2/F2_Proportion_DryWeights_Ttest_table.csv")
 
 
+test <- F2_Proportion_Gonad_MEANS %>% dplyr::filter(Age %in% 165) %>% dplyr::filter(!(pCO2 %in% '1200 μatm')) %>% droplevels
+cohens_d(Proportion_Gonad ~ pCO2, data=test)
 ```
 
 
