@@ -461,56 +461,63 @@ dev.off()
 
 
 # Gonad (to total tissue)
-F2_Proportion_Gonad_MEANS <- Proportion_master %>% 
+F1_Proportion_Gonad_MEANS <- Proportion_master %>% 
                                     dplyr::select(Age,pCO2, Tank_Replicate,
                                                   Proportion_Gonad) %>% 
                                     summarySE(measurevar="Proportion_Gonad", 
                                                groupvars=c("Age","pCO2", "Tank_Replicate")) %>% 
                                     dplyr::arrange(as.numeric(Age))
 
-F2_Proportion_Gonad_MEANS$DPvar    <- F2_Proportion_Gonad_MEANS$Proportion_Gonad
-F2_Proportion_Gonad_MEANS$INDvar   <- F2_Proportion_Gonad_MEANS$pCO2
-F2_Proportion_Gonad_MEANS$GROUPvar <- F2_Proportion_Gonad_MEANS$Age
+F1_Proportion_Gonad_MEANS$DPvar    <- F1_Proportion_Gonad_MEANS$Proportion_Gonad
+F1_Proportion_Gonad_MEANS$INDvar   <- F1_Proportion_Gonad_MEANS$pCO2
+F1_Proportion_Gonad_MEANS$GROUPvar <- F1_Proportion_Gonad_MEANS$Age
 
-ProportionGonad_stats <- as.data.frame(runstats(F2_Proportion_Gonad_MEANS)) # sig effect on Age 196 and 220
+ProportionGonad_stats <- as.data.frame(runstats(F1_Proportion_Gonad_MEANS)) # sig effect on Age 196 and 220
 # No significant differences
-ProportionGonad_stats <- as.data.frame(run_ttest(F2_Proportion_Gonad_MEANS)) # sig effect on Age 196 and 220
+ProportionGonad_ttest <- as.data.frame(run_ttest(F1_Proportion_Gonad_MEANS)) # sig effect on Age 196 and 220
 
 
 
 # Adductpr (to total tissue)
-F2_Proportion_Adductor_MEANS <- Proportion_master %>% 
+F1_Proportion_Adductor_MEANS <- Proportion_master %>% 
                                     dplyr::select(Age,pCO2, Tank_Replicate,
                                                   Proportion_Adductor) %>% 
                                     summarySE(measurevar="Proportion_Adductor", 
                                                groupvars=c("Age","pCO2", "Tank_Replicate")) %>% 
                                     dplyr::arrange(as.numeric(Age))
 
-F2_Proportion_Adductor_MEANS$DPvar    <- F2_Proportion_Adductor_MEANS$Proportion_Adductor
-F2_Proportion_Adductor_MEANS$INDvar   <- F2_Proportion_Adductor_MEANS$pCO2
-F2_Proportion_Adductor_MEANS$GROUPvar <- F2_Proportion_Adductor_MEANS$Age
+F1_Proportion_Adductor_MEANS$DPvar    <- F1_Proportion_Adductor_MEANS$Proportion_Adductor
+F1_Proportion_Adductor_MEANS$INDvar   <- F1_Proportion_Adductor_MEANS$pCO2
+F1_Proportion_Adductor_MEANS$GROUPvar <- F1_Proportion_Adductor_MEANS$Age
 
-ProportionAdductor_stats <- as.data.frame(runstats(F2_Proportion_Adductor_MEANS)) # 165, 196, 220 (220 is Kruskal Wallis!)
+ProportionAdductor_stats <- as.data.frame(runstats(F1_Proportion_Adductor_MEANS)) # 165, 196, 220 (220 is Kruskal Wallis!)
 # No significnat differences
-ProportionAdductor_ttest <- as.data.frame(run_ttest(F2_Proportion_Adductor_MEANS)) # 165, 196, 220 (220 is Kruskal Wallis!)
+ProportionAdductor_ttest <- as.data.frame(run_ttest(F1_Proportion_Adductor_MEANS)) # 165, 196, 220 (220 is Kruskal Wallis!)
 
 
 
 # Adductpr (to total tissue)
-F2_Proportion_Somatic_MEANS <- Proportion_master %>% 
+F1_Proportion_Somatic_MEANS <- Proportion_master %>% 
                                     dplyr::select(Age,pCO2, Tank_Replicate,
                                                   Proportion_Somatic) %>% 
                                     summarySE(measurevar="Proportion_Somatic", 
                                                groupvars=c("Age","pCO2", "Tank_Replicate")) %>% 
                                     dplyr::arrange(as.numeric(Age))
 
-F2_Proportion_Somatic_MEANS$DPvar    <- F2_Proportion_Somatic_MEANS$Proportion_Somatic
-F2_Proportion_Somatic_MEANS$INDvar   <- F2_Proportion_Somatic_MEANS$pCO2
-F2_Proportion_Somatic_MEANS$GROUPvar <- F2_Proportion_Somatic_MEANS$Age
+F1_Proportion_Somatic_MEANS$DPvar    <- F1_Proportion_Somatic_MEANS$Proportion_Somatic
+F1_Proportion_Somatic_MEANS$INDvar   <- F1_Proportion_Somatic_MEANS$pCO2
+F1_Proportion_Somatic_MEANS$GROUPvar <- F1_Proportion_Somatic_MEANS$Age
 
-ProportionSomatic_stats <- as.data.frame(runstats(F2_Proportion_Somatic_MEANS)) # 165, 196, 220 (220 is Kruskal Wallis!)
+ProportionSomatic_stats <- as.data.frame(runstats(F1_Proportion_Somatic_MEANS)) # 165, 196, 220 (220 is Kruskal Wallis!)
 # No significnat differences
-ProportionSomatic_stats <- as.data.frame(run_ttest(F2_Proportion_Somatic_MEANS)) # 165, 196, 220 (220 is Kruskal Wallis!)
+ProportionSomatic_ttest <- as.data.frame(run_ttest(F1_Proportion_Somatic_MEANS)) # 165, 196, 220 (220 is Kruskal Wallis!)
+
+
+ProportionTissues_Ttest <- rbind(ProportionGonad_ttest, ProportionAdductor_ttest, ProportionSomatic_ttest)
+write.csv(ProportionTissues_Ttest, "Output/DryWeights/F1/F1_Proportion_DryWeights_Ttest_table.csv")
+
+
+
 ```
 
 
@@ -622,15 +629,14 @@ runstats <- function(datafilename,  outputfilename) {
 return(outputfilename)
 }
 
-
-
+library(lsr)
 
 run_ttest <- function(datafilename,  outputfilename) {
             # variables for both for loops
-            DF_loop           <- data.frame(matrix(nrow = 1, ncol = 12)) # create dataframe to save during for loop
+            DF_loop           <- data.frame(matrix(nrow = 1, ncol = 13)) # create dataframe to save during for loop
             colnames(DF_loop) <- c('Age_DPF', 'model', 'ShapiroWilk', 'ResidNorm', 'Variance', 
                                    'HomogVar', 'DF.num' , 'DF.denom', 
-                                   'Tstat','P_val', 'SigDif') # names for comuns in the for loop
+                                   'Tstat','P_val', 'SigDif', 'Effsize') # names for comuns in the for loop
             
             unique(datafilename$Age)
             outputfilename <- data.frame()
@@ -667,6 +673,11 @@ run_ttest <- function(datafilename,  outputfilename) {
             Wilcoxmod           <- wilcox.test(Data_all$DPvar ~ 
                                                  as.numeric(as.factor(Data_all$INDvar)))
             
+            # run cohensd for effect size
+            eff_size_cohensd            <- cohensD(DPvar ~ INDvar, data = Data_all, method = "pooled")
+            eff_size_cohensd_unequal    <- cohensD(DPvar ~ INDvar, data = Data_all, method = "unequal") # if ttest d/n meet welchs assumption
+            eff_size_wilcox             <- rstatix::wilcox_effsize(DPvar ~ INDvar, data = Data_all)
+            
             # normality tests for the anova model - asign 
             DF_loop$ShapiroWilk <- paste0(normality_A, '; ',normality_B)
             
@@ -686,6 +697,7 @@ run_ttest <- function(datafilename,  outputfilename) {
                 DF_loop$P_val       <- map_df(list(Ttestmod.eqvar), tidy)$p.value[[1]]
                 DF_loop$SigDif      <- if( (map_df(list(Ttestmod.eqvar), tidy)$p.value[[1]]) > 0.05) {
                   'NO'} else {'YES'}
+                DF_loop$Effsize     <- signif(eff_size_cohensd[[1]], 3)
         
               } else if (normality_A > 0.05 & normality_B > 0.05 & variance < 0.05) {
                 DF_loop$model       <- 'Welchs T test, non-equal variance'
@@ -695,6 +707,8 @@ run_ttest <- function(datafilename,  outputfilename) {
                 DF_loop$P_val       <- map_df(list(Ttestmod.noneqvar), tidy)$p.value[[1]]
                 DF_loop$SigDif      <- if( (map_df(list(Ttestmod.noneqvar), tidy)$p.value[[1]]) > 0.05) {
                   'NO'} else {'YES'}
+                DF_loop$Effsize     <- signif(eff_size_cohensd_unequal[[1]], 3)
+                
               } else {
                 DF_loop$model       <- 'Wilcoxon rank sum exact test'
                 DF_loop$DF.num      <- 'NA'
@@ -702,7 +716,9 @@ run_ttest <- function(datafilename,  outputfilename) {
                 DF_loop$Tstat       <- map_df(list(Wilcoxmod), tidy)$statistic[[1]]
                 DF_loop$P_val       <- map_df(list(Wilcoxmod), tidy)$p.value[[1]]
                 DF_loop$SigDif      <- if( (map_df(list(Wilcoxmod), tidy)$p.value[[1]]) > 0.05) {
-                  'NO'} else {'YES'}            
+                  'NO'} else {'YES'}  
+                DF_loop$Effsize     <- signif(eff_size_wilcox$effsize[[1]], 3)
+
               }
                   DF_loop$Age_DPF     <- GROUPvar_loop
                   # asign loop and cumulative output table
@@ -713,7 +729,6 @@ run_ttest <- function(datafilename,  outputfilename) {
                 }
 return(outputfilename)
 }
-
 
 ```
 
@@ -799,7 +814,7 @@ bfactorGonad.Length.all <- LogDryGonadvShell %>% ggplot(aes(x=log10_Length, y=lo
 
 
 
-library(lsmeans)
+# library(lsmeans)
 m.interaction <- lm(log10_Length ~ log10_Gonad*pCO2, data = LogDryGonadvShell)
 anova(m.interaction)
 #                   Df Sum Sq Mean Sq F value   Pr(>F)    
@@ -1949,7 +1964,8 @@ Tissue_final_plot_SUBSET <- F1_DryTissue.bfactor.long.MEANS_master %>%
 
 # Dry Tissue stats
 ```{r Tissue Stats raw - no standardization}
-
+library(purrr)
+library(rstatix)
 F1_DryTissue.raw.MEAN <- F1_DryTissue.bfactor.long.MEANS_master %>% 
                                 dplyr::filter(measurement %in% 'Total_Dry_Tissue_g')
 F1_DryTissue.raw.MEAN$DPvar    <- F1_DryTissue.raw.MEAN$value
@@ -1957,8 +1973,10 @@ F1_DryTissue.raw.MEAN$INDvar   <- F1_DryTissue.raw.MEAN$pCO2
 F1_DryTissue.raw.MEAN$GROUPvar <- F1_DryTissue.raw.MEAN$Age
 
 Stats_TissueMEAN_raw <- as.data.frame(runstats(F1_DryTissue.raw.MEAN))
+Ttest_TissueMEAN_raw <- as.data.frame(run_ttest(F1_DryTissue.raw.MEAN))
 # About column
 Stats_TissueMEAN_raw$About <- paste0("Tissue: raw, NO BFACTOR + mean data")
+Ttest_TissueMEAN_raw$About <- paste0("Tissue: raw, NO BFACTOR + mean data")
 ```
 
 ```{r Mean Tissue Stats bfactor all - length standardized}
@@ -1970,8 +1988,12 @@ F1_DryTissue.bfactor.MEAN$INDvar   <- F1_DryTissue.bfactor.MEAN$pCO2
 F1_DryTissue.bfactor.MEAN$GROUPvar <- F1_DryTissue.bfactor.MEAN$Age
 
 Stats_TissueMEAN_bfactor.all <- as.data.frame(runstats(F1_DryTissue.bfactor.MEAN))
+Ttest_TissueMEAN_bfactor.all <- as.data.frame(run_ttest(F1_DryTissue.bfactor.MEAN))
+
 # About column
 Stats_TissueMEAN_bfactor.all$About <- paste0("Tissue: one bfactor + mean data")
+Ttest_TissueMEAN_bfactor.all$About <- paste0("Tissue: one bfactor + mean data")
+
 ```
 
 ```{r Mean Tissue Stats bfactor pCO2 - length standardized}
@@ -1984,8 +2006,12 @@ F1_DryTissue.bfactor.MEAN$INDvar   <- F1_DryTissue.bfactor.MEAN$pCO2
 F1_DryTissue.bfactor.MEAN$GROUPvar <- F1_DryTissue.bfactor.MEAN$Age
 
 Stats_TissueMEAN_bfactor.pCO2 <- as.data.frame(runstats(F1_DryTissue.bfactor.MEAN))
+Ttest_TissueMEAN_bfactor.pCO2 <- as.data.frame(run_ttest(F1_DryTissue.bfactor.MEAN))
+
 # About column
 Stats_TissueMEAN_bfactor.pCO2$About <- paste0("Tissue: two pCO2 bfactors + mean data")
+Ttest_TissueMEAN_bfactor.pCO2$About <- paste0("Tissue: two pCO2 bfactors + mean data")
+
 ```
 
 * merge all Tissue stats, save
@@ -1994,6 +2020,10 @@ Stats_TissueMEAN_bfactor.pCO2$About <- paste0("Tissue: two pCO2 bfactors + mean 
 TissueMaster_stats <- rbind(Stats_TissueMEAN_raw, Stats_TissueMEAN_bfactor.all, Stats_TissueMEAN_bfactor.pCO2)
 
 write.csv(TissueMaster_stats, "Output/DryWeights/F1/F1_Tissue_DryWeight_ANOVA_table.csv")
+
+Ttest_TissueMaster_stats <- rbind(Ttest_TissueMEAN_raw, Ttest_TissueMEAN_bfactor.all, Ttest_TissueMEAN_bfactor.pCO2)
+
+write.csv(Ttest_TissueMaster_stats, "Output/DryWeights/F1/F1_Tissue_DryWeight_ttest_table.csv")
 ```
 
 

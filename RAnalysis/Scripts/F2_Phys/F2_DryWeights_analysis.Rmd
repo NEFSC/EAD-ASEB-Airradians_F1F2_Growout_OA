@@ -30,7 +30,7 @@ library(Rmisc)
 library(ggpmisc)
 
 # SET WORKING DIRECTORY :::::::::::::::::::::::::::::::::::::::::::::::
-knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis")
+knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis")
 
 ```
 
@@ -267,10 +267,10 @@ return(outputfilename)
 
 run_ttest <- function(datafilename,  outputfilename) {
             # variables for both for loops
-            DF_loop           <- data.frame(matrix(nrow = 1, ncol = 12)) # create dataframe to save during for loop
+            DF_loop           <- data.frame(matrix(nrow = 1, ncol = 13)) # create dataframe to save during for loop
             colnames(DF_loop) <- c('Age_DPF', 'model', 'ShapiroWilk', 'ResidNorm', 'Variance', 
                                    'HomogVar', 'DF.num' , 'DF.denom', 
-                                   'Tstat','P_val', 'SigDif') # names for comuns in the for loop
+                                   'Tstat','P_val', 'SigDif', 'Effsize') # names for comuns in the for loop
             
             unique(datafilename$Age)
             outputfilename <- data.frame()
@@ -300,12 +300,17 @@ run_ttest <- function(datafilename,  outputfilename) {
                                            alternative = "greater",
                                            var.equal = TRUE)
             
-            Ttestmod.noneqvar   <- t.test(Data_all$DPvar ~ (as.factor(Data_all$INDvar)), 
+            Ttestmod.noneqvar   <- t.test(Data_all$DPvar ~ (as.factor(Data_all$INDvar)),
                                            alternative = "greater",
                                            var.equal = FALSE)
             
             Wilcoxmod           <- wilcox.test(Data_all$DPvar ~ 
                                                  as.numeric(as.factor(Data_all$INDvar)))
+            
+            # run cohensd for effect size
+            eff_size_cohensd            <- cohensD(DPvar ~ INDvar, data = Data_all, method = "pooled")
+            eff_size_cohensd_unequal    <- cohensD(DPvar ~ INDvar, data = Data_all, method = "unequal") # if ttest d/n meet welchs assumption
+            eff_size_wilcox             <- rstatix::wilcox_effsize(DPvar ~ INDvar, data = Data_all)
             
             # normality tests for the anova model - asign 
             DF_loop$ShapiroWilk <- paste0(normality_A, '; ',normality_B)
@@ -326,6 +331,7 @@ run_ttest <- function(datafilename,  outputfilename) {
                 DF_loop$P_val       <- map_df(list(Ttestmod.eqvar), tidy)$p.value[[1]]
                 DF_loop$SigDif      <- if( (map_df(list(Ttestmod.eqvar), tidy)$p.value[[1]]) > 0.05) {
                   'NO'} else {'YES'}
+                DF_loop$Effsize     <- signif(eff_size_cohensd[[1]], 3)
         
               } else if (normality_A > 0.05 & normality_B > 0.05 & variance < 0.05) {
                 DF_loop$model       <- 'Welchs T test, non-equal variance'
@@ -335,6 +341,8 @@ run_ttest <- function(datafilename,  outputfilename) {
                 DF_loop$P_val       <- map_df(list(Ttestmod.noneqvar), tidy)$p.value[[1]]
                 DF_loop$SigDif      <- if( (map_df(list(Ttestmod.noneqvar), tidy)$p.value[[1]]) > 0.05) {
                   'NO'} else {'YES'}
+                DF_loop$Effsize     <- signif(eff_size_cohensd_unequal[[1]], 3)
+                
               } else {
                 DF_loop$model       <- 'Wilcoxon rank sum exact test'
                 DF_loop$DF.num      <- 'NA'
@@ -342,7 +350,9 @@ run_ttest <- function(datafilename,  outputfilename) {
                 DF_loop$Tstat       <- map_df(list(Wilcoxmod), tidy)$statistic[[1]]
                 DF_loop$P_val       <- map_df(list(Wilcoxmod), tidy)$p.value[[1]]
                 DF_loop$SigDif      <- if( (map_df(list(Wilcoxmod), tidy)$p.value[[1]]) > 0.05) {
-                  'NO'} else {'YES'}            
+                  'NO'} else {'YES'}  
+                DF_loop$Effsize     <- signif(eff_size_wilcox$effsize[[1]], 3)
+
               }
                   DF_loop$Age_DPF     <- GROUPvar_loop
                   # asign loop and cumulative output table
@@ -579,7 +589,8 @@ F2_Proportion_Gonad_MEANS$GROUPvar <- F2_Proportion_Gonad_MEANS$Age
 
 ProportionGonad_stats <- as.data.frame(runstats(F2_Proportion_Gonad_MEANS)) # sig effect on Age 196 and 220
 ProportionGonad_ttest <- as.data.frame(run_ttest(F2_Proportion_Gonad_MEANS %>% 
-                                                   dplyr::filter(!(pCO2 %in% '1200 μatm')))) # sig for all
+                                                   dplyr::filter(!(pCO2 %in% '1200 μatm')) %>% 
+                                                   droplevels())) # sig for all
 # Gonad posthoc
 aov_Gonad196             <- aov(lm(Proportion_Gonad~pCO2, data = (F2_Proportion_Gonad_MEANS %>% dplyr::filter(Age %in% 196))))
 summary(aov(aov_Gonad196)) # significnat as known already
@@ -625,7 +636,8 @@ F2_Proportion_Adductor_MEANS$GROUPvar <- F2_Proportion_Adductor_MEANS$Age
 
 ProportionAdductor_stats <- as.data.frame(runstats(F2_Proportion_Adductor_MEANS)) # 165, 196, 220 (220 is Kruskal Wallis!)
 ProportionAdductor_ttest <- as.data.frame(run_ttest(F2_Proportion_Adductor_MEANS %>% 
-                                                   dplyr::filter(!(pCO2 %in% '1200 μatm')))) # sig for all
+                                                   dplyr::filter(!(pCO2 %in% '1200 μatm')) %>% 
+                                                   droplevels()) # sig for all
 # Adductor posthoc
 aov_Adductor165             <- aov(lm(Proportion_Adductor~pCO2, data = 
                                         (F2_Proportion_Adductor_MEANS %>% dplyr::filter(Age %in% 165))))
@@ -673,7 +685,15 @@ F2_Proportion_Somatic_MEANS$GROUPvar <- F2_Proportion_Somatic_MEANS$Age
 
 ProportionSomatic_stats <- as.data.frame(runstats(F2_Proportion_Somatic_MEANS)) # 165, 196, 220 (220 is Kruskal Wallis!)
 ProportionSomatic_ttest <- as.data.frame(run_ttest(F2_Proportion_Somatic_MEANS %>% 
-                                                   dplyr::filter(!(pCO2 %in% '1200 μatm')))) # sig for all
+                                                   dplyr::filter(!(pCO2 %in% '1200 μatm'))%>% 
+                                                   droplevels()) # sig for all
+                                         
+                                         
+                                         
+ProportionTissues_Ttest <- rbind(ProportionGonad_ttest, ProportionAdductor_ttest, ProportionSomatic_ttest)
+write.csv(ProportionTissues_Ttest, "Output/DryWeights/F2/F2_Proportion_DryWeights_Ttest_table.csv")
+
+
 ```
 
 
@@ -734,12 +754,39 @@ bfactorGonad.Length.all <- LogDryGonadvShell %>%
                              theme_classic() +
                              theme(legend.position="none",axis.title.y=element_text(size=7)) +
                              ggtitle("Gonad scaling: log10_Gonad = log10_a + 
-                                      (b.factor * log10_Length)") # +
-                             # geom_smooth(method = lm, color = 'red') +
-                             # ggpmisc::stat_poly_eq(parse=T, 
-                             #                       aes(label = paste(..eq.label.., ..rr.label.., 
-                             #                                       sep = "~~~")),
-                             #                          label.x.npc = "left") 
+                                      (b.factor * log10_Length)") 
+
+
+bfactorGonad.Length.LvM <- LogDryGonadvShell %>%  # 9.69 (174, 0.68)
+                          dplyr::filter(!pCO2 %in% '1200 μatm') %>% 
+                          ggplot(aes(x=log10_Length, y=log10_Gonad)) +
+                          geom_point() +
+                          ggpmisc::stat_ma_line(method = "SMA") + # model 2 regression Standard major axis!
+                          ggpmisc::stat_ma_eq(use_label(c("eq", "n", "R2"))) +
+                          theme(panel.grid.major = element_blank(), 
+                                      panel.grid.minor = element_blank())+ 
+                             scale_x_continuous(name ="log10_Length; in mm") +
+                             scale_y_continuous(name ="log10_MO2; RR in umol L-1 hr-1)") +
+                             theme_classic() +
+                             theme(legend.position="none",axis.title.y=element_text(size=7)) +
+                             ggtitle("Gonad scaling: log10_Gonad = log10_a + 
+                                      (b.factor * log10_Length)") 
+
+
+bfactorGonad.Length.LvH <- LogDryGonadvShell %>%  # 10.2 (168, 0.64)
+                          dplyr::filter(!pCO2 %in% '800 μatm') %>% 
+                          ggplot(aes(x=log10_Length, y=log10_Gonad)) +
+                          geom_point() +
+                          ggpmisc::stat_ma_line(method = "SMA") + # model 2 regression Standard major axis!
+                          ggpmisc::stat_ma_eq(use_label(c("eq", "n", "R2"))) +
+                          theme(panel.grid.major = element_blank(), 
+                                      panel.grid.minor = element_blank())+ 
+                             scale_x_continuous(name ="log10_Length; in mm") +
+                             scale_y_continuous(name ="log10_MO2; RR in umol L-1 hr-1)") +
+                             theme_classic() +
+                             theme(legend.position="none",axis.title.y=element_text(size=7)) +
+                             ggtitle("Gonad scaling: log10_Gonad = log10_a + 
+                                      (b.factor * log10_Length)") 
 
 # call dataset - omit data without gonad weights
 F2_DryGonad <- F2_dryweights %>% 
@@ -754,6 +801,8 @@ print(paste0('youngest = ', min(F2_DryGonad$Age), '; oldest = ', max(F2_DryGonad
 
 #assign bfactors
 bLength.all  <- 9.96 # 
+bLength.LvMall <- 9.69
+bLength.LvHall <- 10.2
 bLength.low  <- 9.28 #  
 bLength.mod  <- 9.52 #  
 bLength.high <- 10.2 #  
@@ -866,7 +915,8 @@ Gonad_final_plot <- F2_DryGonad.bfactor.long.MEANS_master %>%
 
 # Dry Gonad stats
 ```{r Gonad Stats raw - no standardization}
-
+library(purrr)
+library(rstatix)
 F2_DryGonad.raw.MEAN <- F2_DryGonad.bfactor.long.MEANS_master %>% 
                                 dplyr::filter(measurement %in% 'Dry_Gonad_weight_g')
 F2_DryGonad.raw.MEAN$DPvar    <- F2_DryGonad.raw.MEAN$value
@@ -874,10 +924,12 @@ F2_DryGonad.raw.MEAN$INDvar   <- F2_DryGonad.raw.MEAN$pCO2
 F2_DryGonad.raw.MEAN$GROUPvar <- F2_DryGonad.raw.MEAN$Age
 
 Stats_GonadMEAN_raw <- as.data.frame(runstats(F2_DryGonad.raw.MEAN))
-Ttest_GonadMEAN_raw <- as.data.frame(run_ttest(F2_DryGonad.raw.MEAN %>% dplyr::filter(!pCO2 %in% '1200 μatm')))
+Ttest_GonadMEAN_raw <- as.data.frame(run_ttest(F2_DryGonad.raw.MEAN %>% dplyr::filter(!pCO2 %in% '1200 μatm') %>% 
+                                                   droplevels())) # sig for all
 
 # About column
 Stats_GonadMEAN_raw$About <- paste0("Gonad: raw, NO BFACTOR + mean data")
+Ttest_GonadMEAN_raw$About <- paste0("Gonad: raw, NO BFACTOR + mean data")
 ```
 
 ```{r Mean Gonad Stats bfactor all - length standardized}
@@ -890,10 +942,12 @@ F2_DryGonad.bfactor.MEAN$INDvar   <- F2_DryGonad.bfactor.MEAN$pCO2
 F2_DryGonad.bfactor.MEAN$GROUPvar <- F2_DryGonad.bfactor.MEAN$Age
 
 Stats_GonadMEAN_bfactor.all <- as.data.frame(runstats(F2_DryGonad.bfactor.MEAN))
-Ttest_GonadMEAN_bfactor_raw <- as.data.frame(run_ttest(F2_DryGonad.bfactor.MEAN %>% dplyr::filter(!pCO2 %in% '1200 μatm')))
+Ttest_GonadMEAN_bfactor_all <- as.data.frame(run_ttest(F2_DryGonad.bfactor.MEAN %>% dplyr::filter(!pCO2 %in% '1200 μatm')%>% 
+                                                   droplevels())) # sig for all
 
 # About column
 Stats_GonadMEAN_bfactor.all$About <- paste0("Gonad: one bfactor + mean data")
+Ttest_GonadMEAN_bfactor_all$About <- paste0("Gonad: one bfactor + mean data")
 ```
 
 ```{r Mean Gonad Stats bfactor pCO2 - length standardized}
@@ -907,10 +961,12 @@ F2_DryGonad.bfactor.MEAN$INDvar   <- F2_DryGonad.bfactor.MEAN$pCO2
 F2_DryGonad.bfactor.MEAN$GROUPvar <- F2_DryGonad.bfactor.MEAN$Age
 
 Stats_GonadMEAN_bfactor.pCO2 <- as.data.frame(runstats(F2_DryGonad.bfactor.MEAN))
-Ttest_GonadMEAN_bfactor.pCO2 <- as.data.frame(run_ttest(F2_DryGonad.bfactor.MEAN %>% dplyr::filter(!pCO2 %in% '1200 μatm')))
+Ttest_GonadMEAN_bfactor.pCO2 <- as.data.frame(run_ttest(F2_DryGonad.bfactor.MEAN %>% dplyr::filter(!pCO2 %in% '1200 μatm')%>% 
+                                                   droplevels())) # sig for all
 
 # About column
 Stats_GonadMEAN_bfactor.pCO2$About <- paste0("Gonad: two pCO2 bfactors + mean data")
+Ttest_GonadMEAN_bfactor.pCO2$About <- paste0("Gonad: two pCO2 bfactors + mean data")
 ```
 
 
@@ -922,6 +978,13 @@ DryGonad_stats_master <- do.call("rbind",
                                               Stats_GonadMEAN_raw
                                               ))
 write.csv(DryGonad_stats_master, "Output/DryWeights/F2/F2_Gonad_DryWeight_ANOVA_table.csv")
+
+DryGonad_stats_master <- do.call("rbind", 
+                                          list(Ttest_GonadMEAN_bfactor.pCO2,
+                                              Ttest_GonadMEAN_bfactor_all,
+                                              Ttest_GonadMEAN_raw
+                                              ))
+write.csv(DryGonad_stats_master, "Output/DryWeights/F2/F2_Gonad_DryWeight_ttest_table.csv")
 
 ```
 
@@ -978,12 +1041,38 @@ bfactorAdductor.Length.all <- LogDryAdductorvShell %>% ggplot(aes(x=log10_Length
                              theme_classic() +
                              theme(legend.position="none",axis.title.y=element_text(size=7)) +
                              ggtitle("adductor scaling: log10_adductor = log10_a + 
-                                      (b.factor * log10_Length)") #+
-                             # geom_smooth(method = lm, color = 'red') +
-                             # ggpmisc::stat_poly_eq(parse=T, 
-                             #                       aes(label = paste(..eq.label.., ..rr.label.., 
-                             #                                       sep = "~~~")),
-                             #                          label.x.npc = "left") 
+                                      (b.factor * log10_Length)")
+
+bfactorAdductor.Length.LvM <- LogDryAdductorvShell %>%  # 4.15 (45, 0.88)
+                          dplyr::filter(!pCO2 %in% '1200 μatm') %>% 
+                          ggplot(aes(x=log10_Length, y=log10_Adductor)) +
+                          geom_point() +
+                          ggpmisc::stat_ma_line(method = "SMA") + # model 2 regression Standard major axis!
+                          ggpmisc::stat_ma_eq(use_label(c("eq", "n", "R2"))) +
+                          theme(panel.grid.major = element_blank(), 
+                                      panel.grid.minor = element_blank())+ 
+                             scale_x_continuous(name ="log10_Length; in mm") +
+                             scale_y_continuous(name ="log10_Adductor; RR in umol L-1 hr-1)") +
+                             theme_classic() +
+                             theme(legend.position="none",axis.title.y=element_text(size=7)) +
+                             ggtitle("Gonad scaling: log10_Adductor = log10_a + 
+                                      (b.factor * log10_Length)") 
+
+
+bfactorAdductor.Length.LvH <- LogDryAdductorvShell %>%  # 4.33 (45, 0.88)
+                          dplyr::filter(!pCO2 %in% '800 μatm') %>% 
+                          ggplot(aes(x=log10_Length, y=log10_Adductor)) +
+                          geom_point() +
+                          ggpmisc::stat_ma_line(method = "SMA") + # model 2 regression Standard major axis!
+                          ggpmisc::stat_ma_eq(use_label(c("eq", "n", "R2"))) +
+                          theme(panel.grid.major = element_blank(), 
+                                      panel.grid.minor = element_blank())+ 
+                             scale_x_continuous(name ="log10_Length; in mm") +
+                             scale_y_continuous(name ="log10_Adductor; RR in umol L-1 hr-1)") +
+                             theme_classic() +
+                             theme(legend.position="none",axis.title.y=element_text(size=7)) +
+                             ggtitle("Gonad scaling: log10_Adductor = log10_a + 
+                                      (b.factor * log10_Length)") 
 
 # call dataset - omit data without adductor weights
 F2_DryAdductor <- F2_dryweights %>% 
@@ -996,6 +1085,8 @@ seLength.all   <- sd(F2_DryAdductor$Shell_length_mm)/sqrt(length((F2_DryAdductor
 print(paste0('youngest = ', min(F2_DryAdductor$Age), '; oldest = ', max(F2_DryAdductor$Age)))
 #assign bfactors
 bLength.all <- 4.16#
+bLength.LvMall <- 4.15
+bLength.LvHall <- 4.33
 bLength.low <- 4.42#
 bLength.mod <- 3.8#3
 bLength.high <- 4.15#
@@ -1109,10 +1200,12 @@ F2_DryAdductor.raw.MEAN$INDvar   <- F2_DryAdductor.raw.MEAN$pCO2
 F2_DryAdductor.raw.MEAN$GROUPvar <- F2_DryAdductor.raw.MEAN$Age
 
 Stats_AdductorMEAN_raw <- as.data.frame(runstats(F2_DryAdductor.raw.MEAN))
-Ttest_AdductorMEAN_raw <- as.data.frame(runstats(F2_DryAdductor.raw.MEAN %>% dplyr::filter(!pCO2 %in% '1200 μatm')))
+Ttest_AdductorMEAN_raw <- as.data.frame(run_ttest(F2_DryAdductor.raw.MEAN %>% dplyr::filter(!pCO2 %in% '1200 μatm')%>% 
+                                                   droplevels())) # sig for all
 
 # About column
 Stats_AdductorMEAN_raw$About <- paste0("Adductor: raw, NO BFACTOR + mean data")
+Ttest_AdductorMEAN_raw$About <- paste0("Adductor: raw, NO BFACTOR + mean data")
 ```
 
 ```{r Mean Adductor Stats bfactor all - length standardized}
@@ -1124,10 +1217,12 @@ F2_DryAdductor.bfactor.MEAN$INDvar   <- F2_DryAdductor.bfactor.MEAN$pCO2
 F2_DryAdductor.bfactor.MEAN$GROUPvar <- F2_DryAdductor.bfactor.MEAN$Age
 
 Stats_AdductorMEAN_bfactor.all <- as.data.frame(runstats(F2_DryAdductor.bfactor.MEAN))
-Ttest_AdductorMEAN_bfactor.all  <- as.data.frame(runstats(F2_DryAdductor.bfactor.MEAN %>% dplyr::filter(!pCO2 %in% '1200 μatm')))
+Ttest_AdductorMEAN_bfactor.all  <- as.data.frame(run_ttest(F2_DryAdductor.bfactor.MEAN %>% dplyr::filter(!pCO2 %in% '1200 μatm')%>% 
+                                                   droplevels())) # sig for all
 
 # About column
 Stats_AdductorMEAN_bfactor.all$About <- paste0("Adductor: one bfactor + mean data")
+Ttest_AdductorMEAN_bfactor.all$About <- paste0("Adductor: one bfactor + mean data")
 ```
 
 
@@ -1140,10 +1235,12 @@ F2_DryAdductor.bfactor.MEAN$INDvar   <- F2_DryAdductor.bfactor.MEAN$pCO2
 F2_DryAdductor.bfactor.MEAN$GROUPvar <- F2_DryAdductor.bfactor.MEAN$Age
 
 Stats_AdductorMEAN_bfactor.pCO2 <- as.data.frame(runstats(F2_DryAdductor.bfactor.MEAN))
-Ttest_AdductorMEAN_bfactor.pCO2 <- as.data.frame(runstats(F2_DryAdductor.bfactor.MEAN %>% dplyr::filter(!pCO2 %in% '1200 μatm')))
+Ttest_AdductorMEAN_bfactor.pCO2 <- as.data.frame(run_ttest(F2_DryAdductor.bfactor.MEAN %>% dplyr::filter(!pCO2 %in% '1200 μatm')%>% 
+                                                   droplevels())) # sig for all
 
 # About column
 Stats_AdductorMEAN_bfactor.pCO2$About <- paste0("Adductor: two pCO2 bfactors + mean data")
+Ttest_AdductorMEAN_bfactor.pCO2$About <- paste0("Adductor: two pCO2 bfactors + mean data")
 ```
 
 ```{r Dry Adductor output master stats} 
@@ -1154,6 +1251,13 @@ DryAdductor_stats_master <- do.call("rbind",
                                               Stats_AdductorMEAN_raw
                                               ))
 write.csv(DryAdductor_stats_master, "Output/DryWeights/F2/F2_Adductor_DryWeight_ANOVA_table.csv")
+
+DryAdductor_stats_master <- do.call("rbind", 
+                                          list(Ttest_AdductorMEAN_bfactor.pCO2,
+                                              Ttest_AdductorMEAN_bfactor.all,
+                                              Ttest_AdductorMEAN_raw
+                                              ))
+write.csv(DryAdductor_stats_master, "Output/DryWeights/F2/F2_Adductor_DryWeight_ttest_table.csv")
 
 ```
 
@@ -1209,12 +1313,38 @@ bfactorSomatic.Length.all <- LogDrySomaticvShell %>% ggplot(aes(x=log10_Length, 
                              theme_classic() +
                              theme(legend.position="none",axis.title.y=element_text(size=7)) +
                              ggtitle("Somatic scaling: log10_Somatic = log10_a + 
-                                      (b.factor * log10_Length)") #+
-                             # geom_smooth(method = lm, color = 'red') +
-                             # ggpmisc::stat_poly_eq(parse=T, 
-                             #                       aes(label = paste(..eq.label.., ..rr.label.., 
-                             #                                       sep = "~~~")),
-                             #                          label.x.npc = "left") 
+                                      (b.factor * log10_Length)") 
+
+bfactorSomatic.Length.LvM <- LogDrySomaticvShell %>%  # 3.11 (182, 0.90)
+                          dplyr::filter(!pCO2 %in% '1200 μatm') %>% 
+                          ggplot(aes(x=log10_Length, y=log10_Somatic)) +
+                          geom_point() +
+                          ggpmisc::stat_ma_line(method = "SMA") + # model 2 regression Standard major axis!
+                          ggpmisc::stat_ma_eq(use_label(c("eq", "n", "R2"))) +
+                          theme(panel.grid.major = element_blank(), 
+                                      panel.grid.minor = element_blank())+ 
+                             scale_x_continuous(name ="log10_Length; in mm") +
+                             scale_y_continuous(name ="log10_Somatic; RR in umol L-1 hr-1)") +
+                             theme_classic() +
+                             theme(legend.position="none",axis.title.y=element_text(size=7)) +
+                             ggtitle("Gonad scaling: log10_Somatic = log10_a + 
+                                      (b.factor * log10_Length)") 
+
+
+bfactorSomatic.Length.LvH <- LogDrySomaticvShell %>%  # 2.91 (178, 0.93)
+                          dplyr::filter(!pCO2 %in% '800 μatm') %>% 
+                          ggplot(aes(x=log10_Length, y=log10_Somatic)) +
+                          geom_point() +
+                          ggpmisc::stat_ma_line(method = "SMA") + # model 2 regression Standard major axis!
+                          ggpmisc::stat_ma_eq(use_label(c("eq", "n", "R2"))) +
+                          theme(panel.grid.major = element_blank(), 
+                                      panel.grid.minor = element_blank())+ 
+                             scale_x_continuous(name ="log10_Length; in mm") +
+                             scale_y_continuous(name ="log10_Somatic; RR in umol L-1 hr-1)") +
+                             theme_classic() +
+                             theme(legend.position="none",axis.title.y=element_text(size=7)) +
+                             ggtitle("Gonad scaling: log10_Somatic = log10_a + 
+                                      (b.factor * log10_Length)") 
 
 # call dataset - omit data without Somatic weights
 F2_DrySomatic <- F2_dryweights %>% 
@@ -1227,6 +1357,8 @@ seLength.all   <- sd(F2_DrySomatic$Shell_length_mm)/sqrt(length((F2_DrySomatic$S
 print(paste0('youngest = ', min(F2_DrySomatic$Age), '; oldest = ', max(F2_DrySomatic$Age)))
 #assign bfactors
 bLength.all  <- 2.51#
+bLength.LvMall  <-3.11
+bLength.LvHall  <-2.91
 bLength.low  <- 2.63#
 bLength.mod  <- 2.38 #3
 bLength.high <- 2.49#
@@ -1340,8 +1472,12 @@ F2_DrySomatic.raw.MEAN$INDvar   <- F2_DrySomatic.raw.MEAN$pCO2
 F2_DrySomatic.raw.MEAN$GROUPvar <- F2_DrySomatic.raw.MEAN$Age
 
 Stats_SomaticMEAN_raw <- as.data.frame(runstats(F2_DrySomatic.raw.MEAN))
+Ttest_SomaticMEAN_raw  <- as.data.frame(run_ttest(F2_DrySomatic.raw.MEAN %>% dplyr::filter(!pCO2 %in% '1200 μatm')%>% 
+                                                   droplevels())) # sig for all
+
 # About column
 Stats_SomaticMEAN_raw$About <- paste0("Somatic: raw, NO BFACTOR + mean data")
+Ttest_SomaticMEAN_raw$About <- paste0("Somatic: raw, NO BFACTOR + mean data")
 ```
 
 ```{r Mean Somatic Stats bfactor all - length standardized}
@@ -1353,8 +1489,12 @@ F2_DrySomatic.bfactor.MEAN$INDvar   <- F2_DrySomatic.bfactor.MEAN$pCO2
 F2_DrySomatic.bfactor.MEAN$GROUPvar <- F2_DrySomatic.bfactor.MEAN$Age
 
 Stats_SomaticMEAN_bfactor.all <- as.data.frame(runstats(F2_DrySomatic.bfactor.MEAN))
+Ttest_SomaticMEAN_bfactor.all <- as.data.frame(run_ttest(F2_DrySomatic.bfactor.MEAN %>% dplyr::filter(!pCO2 %in% '1200 μatm')%>% 
+                                                   droplevels())) # sig for all
+
 # About column
 Stats_SomaticMEAN_bfactor.all$About <- paste0("Somatic: one bfactor + mean data")
+Ttest_SomaticMEAN_bfactor.all$About <- paste0("Somatic: one bfactor + mean data")
 ```
 
 ```{r Mean Somatic Stats bfactor pCO2 - length standardized}
@@ -1366,8 +1506,12 @@ F2_DrySomatic.bfactor.MEAN$INDvar   <- F2_DrySomatic.bfactor.MEAN$pCO2
 F2_DrySomatic.bfactor.MEAN$GROUPvar <- F2_DrySomatic.bfactor.MEAN$Age
 
 Stats_SomaticMEAN_bfactor.pCO2 <- as.data.frame(runstats(F2_DrySomatic.bfactor.MEAN))
+Ttest_SomaticMEAN_bfactor.pCO2 <- as.data.frame(run_ttest(F2_DrySomatic.bfactor.MEAN %>% dplyr::filter(!pCO2 %in% '1200 μatm')%>% 
+                                                   droplevels())) # sig for all
+
 # About column
 Stats_SomaticMEAN_bfactor.pCO2$About <- paste0("Somatic: two pCO2 bfactors + mean data")
+Ttest_SomaticMEAN_bfactor.pCO2$About <- paste0("Somatic: two pCO2 bfactors + mean data")
 ```
 
 ```{r Dry Somatic output master stats} 
@@ -1378,6 +1522,14 @@ DrySomatic_stats_master <- do.call("rbind",
                                               Stats_SomaticMEAN_raw
                                               ))
 write.csv(DrySomatic_stats_master, "Output/DryWeights/F2/F2_Somatic_DryWeight_ANOVA_table.csv")
+
+DrySomatic_stats_master <- do.call("rbind", 
+                                          list(Ttest_SomaticMEAN_bfactor.pCO2,
+                                              Ttest_SomaticMEAN_bfactor.all,
+                                              Ttest_SomaticMEAN_raw
+                                              ))
+write.csv(DrySomatic_stats_master, "Output/DryWeights/F2/F2_Somatic_DryWeight_ttest_table.csv")
+
 
 ```
 
@@ -1401,7 +1553,9 @@ LogDryTissue <- F2_dryweights_long %>%
                           na.omit() %>% # we only have shell for later life stage - omit rows without it
                           dplyr::filter(!log10_Tissue %in% '-Inf') # ommit instances when shell weight == 0
 
-bfactorTissue.Length.pCO2 <- LogDryTissue %>% ggplot(aes(x=log10_Length, y=log10_Tissue, color = pCO2)) +
+bfactorTissue.Length.pCO2 <- LogDryTissue %>% 
+                          dplyr::filter(!log10_Tissue < -2.0) %>%  # a major outlier under the moderate OA
+                          ggplot(aes(x=log10_Length, y=log10_Tissue, color = pCO2)) +
                           geom_point() +
                           ggpmisc::stat_ma_line(method = "SMA") + # model 2 regression Standard major axis!
                           ggpmisc::stat_ma_eq(use_label(c("eq", "n", "R2")), size = 3) +
@@ -1423,7 +1577,9 @@ bfactorTissue.Length.pCO2 <- LogDryTissue %>% ggplot(aes(x=log10_Length, y=log10
                              facet_wrap(~pCO2)
 
 
-bfactorTissue.Length.all <- LogDryTissue %>% ggplot(aes(x=log10_Length, y=log10_Tissue)) +
+bfactorTissue.Length.all <- LogDryTissue %>% 
+                          dplyr::filter(!log10_Tissue < -2.0) %>%  # a major outlier under the moderate OA
+                          ggplot(aes(x=log10_Length, y=log10_Tissue)) +
                           geom_point() +
                           ggpmisc::stat_ma_line(method = "SMA") + # model 2 regression Standard major axis!
                           ggpmisc::stat_ma_eq(use_label(c("eq", "n", "R2"))) +
@@ -1435,11 +1591,41 @@ bfactorTissue.Length.all <- LogDryTissue %>% ggplot(aes(x=log10_Length, y=log10_
                              theme(legend.position="none",axis.title.y=element_text(size=7)) +
                              ggtitle("Total tissue scaling: log10_Tissue = log10_a + 
                                       (b.factor * log10_Length)") +
-                             geom_smooth(method = lm, color = 'red')# +
-                             # ggpmisc::stat_poly_eq(parse=T, 
-                             #                       aes(label = paste(..eq.label.., ..rr.label.., 
-                             #                                       sep = "~~~")),
-                             #                          label.x.npc = "left") 
+                             geom_smooth(method = lm, color = 'red')
+
+
+bfactorTissue.Length.LvM <- LogDryTissue %>%  # 3.42 (195, 0.97)
+                          dplyr::filter(!log10_Tissue < -2.0) %>%  # a major outlier under the moderate OA
+                          dplyr::filter(!pCO2 %in% '1200 μatm') %>% 
+                          ggplot(aes(x=log10_Length, y=log10_Tissue)) +
+                          geom_point() +
+                          ggpmisc::stat_ma_line(method = "SMA") + # model 2 regression Standard major axis!
+                          ggpmisc::stat_ma_eq(use_label(c("eq", "n", "R2"))) +
+                          theme(panel.grid.major = element_blank(), 
+                                      panel.grid.minor = element_blank())+ 
+                             scale_x_continuous(name ="log10_Length; in mm") +
+                             scale_y_continuous(name ="log10_Tissue; RR in umol L-1 hr-1)") +
+                             theme_classic() +
+                             theme(legend.position="none",axis.title.y=element_text(size=7)) +
+                             ggtitle("Gonad scaling: log10_Tissue = log10_a + 
+                                      (b.factor * log10_Length)") 
+
+
+bfactorTissue.Length.LvH <- LogDryTissue %>%  # 3.47 (192, 0.97)
+                          dplyr::filter(!pCO2 %in% '800 μatm') %>% 
+                          ggplot(aes(x=log10_Length, y=log10_Tissue)) +
+                          geom_point() +
+                          ggpmisc::stat_ma_line(method = "SMA") + # model 2 regression Standard major axis!
+                          ggpmisc::stat_ma_eq(use_label(c("eq", "n", "R2"))) +
+                          theme(panel.grid.major = element_blank(), 
+                                      panel.grid.minor = element_blank())+ 
+                             scale_x_continuous(name ="log10_Length; in mm") +
+                             scale_y_continuous(name ="log10_Tissue; RR in umol L-1 hr-1)") +
+                             theme_classic() +
+                             theme(legend.position="none",axis.title.y=element_text(size=7)) +
+                             ggtitle("Gonad scaling: log10_Tissue = log10_a + 
+                                      (b.factor * log10_Length)") 
+
 
 # call dataset - omit data without Shell weights
 F2_DryTissue <- F2_dryweights %>% 
@@ -1454,9 +1640,11 @@ StandardShellSize = 40
 # age range of animals 
 print(paste0('youngest = ', min(F2_DryTissue$Age), '; oldest = ', max(F2_DryTissue$Age)))
 #assign bfactors
-bLength.all  <- 3.53#
+bLength.all  <- 3.45#
+bLength.LvMall  <-3.42
+bLength.LvHall  <- 3.47
 bLength.low  <- 3.42#
-bLength.mod  <- 3.65 #3
+bLength.mod  <- 3.41 #3
 bLength.high <- 3.53#
 
 # standardize Shell dry weight using bfactors
@@ -1571,8 +1759,11 @@ F2_DryTissue.raw.MEAN$INDvar   <- F2_DryTissue.raw.MEAN$pCO2
 F2_DryTissue.raw.MEAN$GROUPvar <- F2_DryTissue.raw.MEAN$Age
 
 Stats_TissueMEAN_raw <- as.data.frame(runstats(F2_DryTissue.raw.MEAN))
+Ttest_TissueMEAN_raw <- as.data.frame(run_ttest(F2_DryTissue.raw.MEAN %>% dplyr::filter(!pCO2 %in% '1200 μatm')%>% 
+                                                   droplevels())) # sig for all
 # About column
 Stats_TissueMEAN_raw$About <- paste0("Tissue: raw, NO BFACTOR + mean data")
+Ttest_TissueMEAN_raw$About <- paste0("Tissue: raw, NO BFACTOR + mean data")
 ```
 
 ```{r Mean Tissue Stats bfactor all - length standardized}
@@ -1584,8 +1775,11 @@ F2_DryTissue.bfactor.MEAN$INDvar   <- F2_DryTissue.bfactor.MEAN$pCO2
 F2_DryTissue.bfactor.MEAN$GROUPvar <- F2_DryTissue.bfactor.MEAN$Age
 
 Stats_TissueMEAN_bfactor.all <- as.data.frame(runstats(F2_DryTissue.bfactor.MEAN))
+Ttest_TissueMEAN_bfactor.all<- as.data.frame(run_ttest(F2_DryTissue.bfactor.MEAN %>% dplyr::filter(!pCO2 %in% '1200 μatm')%>% 
+                                                   droplevels())) # sig for all
 # About column
 Stats_TissueMEAN_bfactor.all$About <- paste0("Tissue: one bfactor + mean data")
+Ttest_TissueMEAN_bfactor.all$About <- paste0("Tissue: one bfactor + mean data")
 ```
 
 ```{r Mean Tissue Stats bfactor pCO2 specific - length standardized}
@@ -1597,8 +1791,12 @@ F2_DryTissue.bfactor.MEAN$INDvar   <- F2_DryTissue.bfactor.MEAN$pCO2
 F2_DryTissue.bfactor.MEAN$GROUPvar <- F2_DryTissue.bfactor.MEAN$Age
 
 Stats_TissueMEAN_bfactor.pCO2 <- as.data.frame(runstats(F2_DryTissue.bfactor.MEAN))
+Ttest_TissueMEAN_bfactor.pCO2 <- as.data.frame(run_ttest(F2_DryTissue.bfactor.MEAN %>% dplyr::filter(!pCO2 %in% '1200 μatm')%>% 
+                                                   droplevels())) # sig for all
+
 # About column
 Stats_TissueMEAN_bfactor.pCO2$About <- paste0("Tissue: two pCO2 bfactors + mean data")
+Ttest_TissueMEAN_bfactor.pCO2$About <- paste0("Tissue: two pCO2 bfactors + mean data")
 ```
 
 
@@ -1610,6 +1808,13 @@ DryTissue_stats_master <- do.call("rbind",
                                               Stats_TissueMEAN_raw
                                               ))
 write.csv(DryTissue_stats_master, "Output/DryWeights/F2/F2_Tissue_DryWeight_ANOVA_table.csv")
+
+DryTissue_stats_master <- do.call("rbind", 
+                                          list(Ttest_TissueMEAN_bfactor.pCO2,
+                                              Ttest_TissueMEAN_bfactor.all,
+                                              Ttest_TissueMEAN_raw
+                                              ))
+write.csv(DryTissue_stats_master, "Output/DryWeights/F2/F2_Tissue_DryWeight_ttest_table.csv")
 
 ```
 
@@ -1678,12 +1883,38 @@ bfactorShell.Length.all <- LogDryShellvShell %>% ggplot(aes(x=log10_Length, y=lo
                              theme_classic() +
                              theme(legend.position="none",axis.title.y=element_text(size=7)) +
                              ggtitle("Shell scaling: log10_Shell = log10_a + 
-                                      (b.factor * log10_Length)") #+
-                             # geom_smooth(method = lm, color = 'red') +
-                             # ggpmisc::stat_poly_eq(parse=T, 
-                             #                       aes(label = paste(..eq.label.., ..rr.label.., 
-                             #                                       sep = "~~~")),
-                             #                          label.x.npc = "left") 
+                                      (b.factor * log10_Length)") 
+
+bfactorShell.Length.LvM <- LogDryShellvShell %>%  # 2.92 (181, 0.98)
+                          dplyr::filter(!pCO2 %in% '1200 μatm') %>% 
+                          ggplot(aes(x=log10_Length, y=log10_Shell)) +
+                          geom_point() +
+                          ggpmisc::stat_ma_line(method = "SMA") + # model 2 regression Standard major axis!
+                          ggpmisc::stat_ma_eq(use_label(c("eq", "n", "R2"))) +
+                          theme(panel.grid.major = element_blank(), 
+                                      panel.grid.minor = element_blank())+ 
+                             scale_x_continuous(name ="log10_Length; in mm") +
+                             scale_y_continuous(name ="log10_Shell; RR in umol L-1 hr-1)") +
+                             theme_classic() +
+                             theme(legend.position="none",axis.title.y=element_text(size=7)) +
+                             ggtitle("Gonad scaling: log10_Shell = log10_a + 
+                                      (b.factor * log10_Length)") 
+
+
+bfactorShell.Length.LvH <- LogDryShellvShell %>%  # 2.96 (177, 0.98)
+                          dplyr::filter(!pCO2 %in% '800 μatm') %>% 
+                          ggplot(aes(x=log10_Length, y=log10_Shell)) +
+                          geom_point() +
+                          ggpmisc::stat_ma_line(method = "SMA") + # model 2 regression Standard major axis!
+                          ggpmisc::stat_ma_eq(use_label(c("eq", "n", "R2"))) +
+                          theme(panel.grid.major = element_blank(), 
+                                      panel.grid.minor = element_blank())+ 
+                             scale_x_continuous(name ="log10_Length; in mm") +
+                             scale_y_continuous(name ="log10_Shell; RR in umol L-1 hr-1)") +
+                             theme_classic() +
+                             theme(legend.position="none",axis.title.y=element_text(size=7)) +
+                             ggtitle("Gonad scaling: log10_Shell = log10_a + 
+                                      (b.factor * log10_Length)") 
 
 # call dataset - omit data without Shell weights
 F2_DryShell <- F2_dryweights %>% 
@@ -1696,6 +1927,8 @@ seLength.all   <- sd(F2_DryShell$Shell_length_mm)/sqrt(length((F2_DryShell$Shell
 print(paste0('youngest = ', min(F2_DryShell$Age), '; oldest = ', max(F2_DryShell$Age)))
 #assign bfactors
 bLength.all  <- 2.95#
+bLength.LvMall  <- 2.92
+bLength.LvHall  <- 2.96
 bLength.low  <- 2.9#
 bLength.mod  <- 2.93 #3
 bLength.high <- 3.01#
@@ -1811,8 +2044,12 @@ F2_DryShell.raw.MEAN$INDvar   <- F2_DryShell.raw.MEAN$pCO2
 F2_DryShell.raw.MEAN$GROUPvar <- F2_DryShell.raw.MEAN$Age
 
 Stats_ShellMEAN_raw <- as.data.frame(runstats(F2_DryShell.raw.MEAN))
+Ttest_ShellMEAN_raw <- as.data.frame(run_ttest(F2_DryShell.raw.MEAN %>% dplyr::filter(!pCO2 %in% '1200 μatm')%>% 
+                                                   droplevels())) # sig for all
+
 # About column
 Stats_ShellMEAN_raw$About <- paste0("Shell: raw, NO BFACTOR + mean data")
+Ttest_ShellMEAN_raw$About <- paste0("Shell: raw, NO BFACTOR + mean data")
 ```
 
 ```{r Mean Shell Stats bfactor all - length standardized}
@@ -1824,8 +2061,12 @@ F2_DryShell.bfactor.MEAN$INDvar   <- F2_DryShell.bfactor.MEAN$pCO2
 F2_DryShell.bfactor.MEAN$GROUPvar <- F2_DryShell.bfactor.MEAN$Age
 
 Stats_ShellMEAN_bfactor.all <- as.data.frame(runstats(F2_DryShell.bfactor.MEAN))
+Ttest_ShellMEAN_bfactor.all <- as.data.frame(run_ttest(F2_DryShell.bfactor.MEAN %>% dplyr::filter(!pCO2 %in% '1200 μatm')%>% 
+                                                   droplevels())) # sig for all
+
 # About column
 Stats_ShellMEAN_bfactor.all$About <- paste0("Shell: one bfactor + mean data")
+Ttest_ShellMEAN_bfactor.all$About <- paste0("Shell: one bfactor + mean data")
 ```
 
 ```{r Mean Shell Stats bfactor pCO2 specific - length standardized}
@@ -1837,8 +2078,12 @@ F2_DryShell.bfactor.MEAN$INDvar   <- F2_DryShell.bfactor.MEAN$pCO2
 F2_DryShell.bfactor.MEAN$GROUPvar <- F2_DryShell.bfactor.MEAN$Age
 
 Stats_ShellMEAN_bfactor.pCO2 <- as.data.frame(runstats(F2_DryShell.bfactor.MEAN))
+Ttest_ShellMEAN_bfactor.pCO2 <- as.data.frame(run_ttest(F2_DryShell.bfactor.MEAN %>% dplyr::filter(!pCO2 %in% '1200 μatm')%>% 
+                                                   droplevels())) # sig for all
+
 # About column
 Stats_ShellMEAN_bfactor.pCO2$About <- paste0("Shell: two pCO2 b factors + mean data")
+Ttest_ShellMEAN_bfactor.pCO2$About <- paste0("Shell: two pCO2 b factors + mean data")
 ```
 
 
@@ -1850,6 +2095,13 @@ DryShell_stats_master <- do.call("rbind",
                                               Stats_ShellMEAN_raw
                                               ))
 write.csv(DryShell_stats_master, "Output/DryWeights/F2/F2_Shell_DryWeight_ANOVA_table.csv")
+
+DryShell_stats_master <- do.call("rbind", 
+                                          list(Ttest_ShellMEAN_bfactor.pCO2,
+                                              Ttest_ShellMEAN_bfactor.all,
+                                              Ttest_ShellMEAN_raw
+                                              ))
+write.csv(DryShell_stats_master, "Output/DryWeights/F2/F2_Shell_DryWeight_ttest_table.csv")
 
 ```
 
