@@ -675,7 +675,7 @@ F2_Proportion_Adductor_MEANS$GROUPvar <- F2_Proportion_Adductor_MEANS$Age
 ProportionAdductor_stats <- as.data.frame(runstats(F2_Proportion_Adductor_MEANS)) # 165, 196, 220 (220 is Kruskal Wallis!)
 ProportionAdductor_ttest <- as.data.frame(run_ttest(F2_Proportion_Adductor_MEANS %>% 
                                                    dplyr::filter(!(pCO2 %in% '1200 μatm')) %>% 
-                                                   droplevels()) # sig for all
+                                                   droplevels())) # sig for all
 # Adductor posthoc
 aov_Adductor165             <- aov(lm(Proportion_Adductor~pCO2, data = 
                                         (F2_Proportion_Adductor_MEANS %>% dplyr::filter(Age %in% 165))))
@@ -724,16 +724,43 @@ F2_Proportion_Somatic_MEANS$GROUPvar <- F2_Proportion_Somatic_MEANS$Age
 ProportionSomatic_stats <- as.data.frame(runstats(F2_Proportion_Somatic_MEANS)) # 165, 196, 220 (220 is Kruskal Wallis!)
 ProportionSomatic_ttest <- as.data.frame(run_ttest(F2_Proportion_Somatic_MEANS %>% 
                                                    dplyr::filter(!(pCO2 %in% '1200 μatm'))%>% 
-                                                   droplevels()) # sig for all
+                                                   droplevels())) # sig for all
                                          
                                          
                                          
 ProportionTissues_Ttest <- rbind(ProportionGonad_ttest, ProportionAdductor_ttest, ProportionSomatic_ttest)
-write.csv(ProportionTissues_Ttest, "Output/DryWeights/F2/F2_Proportion_DryWeights_Ttest_table.csv")
+write.csv(ProportionTissues_Ttest, "Output/DryWeights/F2/LowvModerate/F2_Proportion_DryWeights_Ttest_table.csv")
 
 
 test <- F2_Proportion_Gonad_MEANS %>% dplyr::filter(Age %in% 165) %>% dplyr::filter(!(pCO2 %in% '1200 μatm')) %>% droplevels
 cohens_d(Proportion_Gonad ~ pCO2, data=test)
+
+stepwise_bonferroni <- function(p_values, alpha = 0.05) {
+  n <- length(p_values)
+  sorted_p <- sort(p_values)
+  adjusted_alpha <- alpha / (n:1)
+  
+  reject <- rep(FALSE, n)
+  for (i in 1:n) {
+    if (sorted_p[i] <= adjusted_alpha[i]) {
+      reject[i] <- TRUE
+    } else {
+      break
+    }
+  }
+  
+  return(list(p_values = sorted_p, adjusted_alpha = adjusted_alpha, reject = reject))
+}
+
+# Example usage
+p_values <- c(0.999787897829146, 0.044829539655991, 0.00282743992484663, 0.627352271798895)
+result <- stepwise_bonferroni(p_values)
+print(result)
+
+
+p_values <- c(0.0127686652601359, 0.0300550188002525, 0.0958246805764469, 0.030864241342126)
+result <- stepwise_bonferroni(p_values)
+print(result)
 ```
 
 
