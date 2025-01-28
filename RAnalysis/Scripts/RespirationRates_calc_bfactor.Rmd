@@ -18,21 +18,21 @@ library(ggplot2)
 library(forcats)
 library(lme4)
 library(lmerTest)
-library(see)
+# library(see)
 library(performance)
 library(car)
 library(kableExtra)
 library(pander)
 library(data.table)
 library(stringr)
-library(latex2exp)
+# library(latex2exp)
 library(Rmisc)
 library(devtools)
 library(ggpubr)
 # library(hrbrthemes)
 
 # SET WORKING DIRECTORY :::::::::::::::::::::::::::::::::::::::::::::::
-knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis")
+knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis")
 #knitr::opts_knit$set(root.dir = "C:/Users/samuel.gurr/Documents/Github_repositories/EAD-ASEB-Airradians_multigen_OA/RAnalysis")
 
 
@@ -297,22 +297,22 @@ Resp.Master_OM <- Resp.Master[!is.na(Resp.Master$Length_um),] %>%
                       
                       filetype == "SDR_data" & Date %in% c('9/30/2021','10/26/2021')~ 1.7, # small unfed F1s foodxOA 
                       
-                      # filetype == "LoLigo_data" & Date %in% c('10/26/2021') & Channel == 'CH1' ~ 23.1, # F1 data
-                      # filetype == "LoLigo_data" & Date %in% c('10/26/2021') & Channel == 'CH2' ~ 23.05, 
-                      # filetype == "LoLigo_data" & Date %in% c('10/26/2021') & Channel == 'CH4' ~ 22.55,
-                      # filetype == "LoLigo_data" & Date %in% c('10/26/2021') & Channel == 'CH5' ~ 23.18,
-                      # filetype == "LoLigo_data" & Date %in% c('10/26/2021') & Channel == 'CH6' ~ 23.24,
-                      # filetype == "LoLigo_data" & Date %in% c('10/26/2021') & Channel == 'CH7' ~ 22.63, 
-                      # filetype == "LoLigo_data" & Date %in% c('10/26/2021') & Channel == 'CH8' ~ 22.95,
-                      # filetype == "LoLigo_data" & Date %in% c('10/26/2021') & Channel == 'CH3' ~ 23.31,
-                      filetype == "LoLigo_data" & Date %in% c('10/26/2021') & Channel == 'CH1' ~ 68.55323, # F1 data
-                      filetype == "LoLigo_data" & Date %in% c('10/26/2021') & Channel == 'CH2' ~ 68.85583, 
-                      filetype == "LoLigo_data" & Date %in% c('10/26/2021') & Channel == 'CH4' ~ 68.95481,
-                      filetype == "LoLigo_data" & Date %in% c('10/26/2021') & Channel == 'CH5' ~ 68.57288,
-                      filetype == "LoLigo_data" & Date %in% c('10/26/2021') & Channel == 'CH6' ~ 68.01878,
-                      filetype == "LoLigo_data" & Date %in% c('10/26/2021') & Channel == 'CH7' ~ 68.54551, 
-                      filetype == "LoLigo_data" & Date %in% c('10/26/2021') & Channel == 'CH8' ~ 68.53297,
-                      filetype == "LoLigo_data" & Date %in% c('10/26/2021') & Channel == 'CH3' ~ 68.87473,
+                      filetype == "LoLigo_data" & Date %in% c('10/26/2021') & Channel == 'CH1' ~ 23.1, # F1 data, lower values
+                      filetype == "LoLigo_data" & Date %in% c('10/26/2021') & Channel == 'CH2' ~ 23.05,
+                      filetype == "LoLigo_data" & Date %in% c('10/26/2021') & Channel == 'CH4' ~ 22.55,
+                      filetype == "LoLigo_data" & Date %in% c('10/26/2021') & Channel == 'CH5' ~ 23.18,
+                      filetype == "LoLigo_data" & Date %in% c('10/26/2021') & Channel == 'CH6' ~ 23.24,
+                      filetype == "LoLigo_data" & Date %in% c('10/26/2021') & Channel == 'CH7' ~ 22.63,
+                      filetype == "LoLigo_data" & Date %in% c('10/26/2021') & Channel == 'CH8' ~ 22.95,
+                      filetype == "LoLigo_data" & Date %in% c('10/26/2021') & Channel == 'CH3' ~ 23.31,
+                      # filetype == "LoLigo_data" & Date %in% c('10/26/2021') & Channel == 'CH1' ~ 68.55323, # F1 data
+                      # filetype == "LoLigo_data" & Date %in% c('10/26/2021') & Channel == 'CH2' ~ 68.85583, 
+                      # filetype == "LoLigo_data" & Date %in% c('10/26/2021') & Channel == 'CH4' ~ 68.95481,
+                      # filetype == "LoLigo_data" & Date %in% c('10/26/2021') & Channel == 'CH5' ~ 68.57288,
+                      # filetype == "LoLigo_data" & Date %in% c('10/26/2021') & Channel == 'CH6' ~ 68.01878,
+                      # filetype == "LoLigo_data" & Date %in% c('10/26/2021') & Channel == 'CH7' ~ 68.54551, 
+                      # filetype == "LoLigo_data" & Date %in% c('10/26/2021') & Channel == 'CH8' ~ 68.53297,
+                      # filetype == "LoLigo_data" & Date %in% c('10/26/2021') & Channel == 'CH3' ~ 68.87473,
 
                       filetype == "LoLigo_data" & Date %in% c('2/2/2022','3/1/2022') & Channel == 'CH1' ~ 68.55323, # F1 data
                       filetype == "LoLigo_data" & Date %in% c('2/2/2022','3/1/2022') & Channel == 'CH2' ~ 68.85583, 
@@ -506,7 +506,7 @@ Resp.Master_OM %>% ggplot(aes(x = Length_um, y = resp_umol_hr)) +
 ```{r Calculate Resp Rates & WRTIE CSV, echo=TRUE, message = FALSE, warning = FALSE}
 
 #write.csv(Resp.Master_OM, "C:/Users/samjg/Documents/Github_repositories/Airradians_OA/RAnalysis/Output/Respiration/Calculated_Resp_Master.csv")
-write.csv(Resp.Master_OM, "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/Respiration/RR_calc_raw.csv")
+write.csv(Resp.Master_OM, "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/Respiration/RR_calc_raw.csv")
 
 Resp.Master_OM <- read.csv("Output/Respiration/RR_calc_raw.csv", head= T)
 
@@ -815,7 +815,7 @@ MO2_b.factorTDW_PLOT_pCO2_Gen <- RR_master_OM %>%
                           #                       label.x.npc = "left") +
                           facet_wrap(~pCO2*Gen)
 
-pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/Respiration/metabolic_scaling/MetabolicScaling_bFactor_TDW_OM.pdf"), width = 8, height = 16)
+pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/Respiration/metabolic_scaling/MetabolicScaling_bFactor_TDW_OM.pdf"), width = 8, height = 16)
 print(ggarrange(MO2_b.factor_PLOT_OM, 
                 MO2_b.factorTDW_PLOT_Gen,
                 MO2_b.factorTDW_PLOT_pCO2,
@@ -870,7 +870,7 @@ TDW_RR_b.factor_LowVMod <- RR_master_OM %>%
                                                                  "F2 x moderate pCO2"))
 TDW_RR_b.factor_LowVMod_facetted  <- TDW_RR_b.factor_LowVMod + facet_wrap(~Gen)
 
-pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/Respiration/metabolic_scaling/F1_F2_RR_bFactor_TDW_LowvMod.pdf"), 
+pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/Respiration/metabolic_scaling/F1_F2_RR_bFactor_TDW_LowvMod.pdf"), 
     width = 5, height = 10)
 print(ggpubr::ggarrange(TDW_RR_b.factor_LowVMod,
                         TDW_RR_b.factor_LowVMod_facetted, nrow = 2, ncol = 1)) # print the model diagnostics
@@ -908,7 +908,7 @@ F2_TDW_RR_b.factor_LowVHigh <- RR_master_OM %>%
                               ggtitle("Allometric scaling: log10_VO2 = log10_a + (b.factor * log10_TDW)") 
 
 
-pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/Respiration/metabolic_scaling/F2_RR_bFactor_TDW_LowvHigh.pdf"), 
+pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/Respiration/metabolic_scaling/F2_RR_bFactor_TDW_LowvHigh.pdf"), 
     width = 5, height = 5)
 print(F2_TDW_RR_b.factor_LowVHigh) # print the model diagnostics
 dev.off() 
@@ -918,18 +918,18 @@ dev.off()
 
 ### summary:
 * all
--   TDW b factor total = 0.801
+-   TDW b factor total = 0.923
 * Generation
--  F1 TDW b factor  = 0.724
+-  F1 TDW b factor  = 0.903
 -  F2 TDW b factor  = 0.955
 * treamtent
--   Low pCO2 TDW b factor  = 0.758
--   Moderate pCO2 TDW b factor  = 0.775
+-   Low pCO2 TDW b factor  = 0.91
+-   Moderate pCO2 TDW b factor  = 0.897
 -   High pCO2 TDW b factor  = 1.05
 *  treamtent x Generation
 F1
--   Low pCO2 F1 TDW b factor  = 0.732
--   Moderate pCO2 F1 TDW b factor  = 0.710
+-   Low pCO2 F1 TDW b factor  = 0.928
+-   Moderate pCO2 F1 TDW b factor  = 0.813
 F2
 -   Low pCO2 F2 TDW b factor  = 0.826
 -   Moderate pCO2 F2 TDW b factor  = 0.986
@@ -1038,7 +1038,7 @@ MO2_b.factor_PLOT_facetted_OM <- RR_master_OM %>%
                                                 label.x.npc = "left") +
                           facet_wrap(~pCO2)
 
-pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/Respiration/metabolic_scaling/MetabolicScaling_bFactor_TDW_OM_biovolcalc.pdf"), width = 8, height = 8)
+pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/Respiration/metabolic_scaling/MetabolicScaling_bFactor_TDW_OM_biovolcalc.pdf"), width = 8, height = 8)
 print(ggarrange(MO2_b.factor_PLOT_OM, MO2_b.factor_PLOT_facetted_OM, nrow = 2, ncol = 1)) # print the model diagnostics 
 dev.off()
 print(ggarrange(MO2_b.factor_PLOT_OM, MO2_b.factor_PLOT_facetted_OM, nrow = 2, ncol = 1)) # print the model diagnostics 
@@ -1127,7 +1127,7 @@ MO2_b.factorLENGTH_PLOT_pCO2_Gen <- RR_master_OM %>%
 
 
 # OUTPUT PLOTS 
-pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/Respiration/metabolic_scaling/MetabolicScaling_bFactor_LENGTH.pdf"), width = 8, height = 16)
+pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/Respiration/metabolic_scaling/MetabolicScaling_bFactor_LENGTH.pdf"), width = 8, height = 16)
 print(ggarrange(MO2_b.factorLENGTH_PLOT,
                 MO2_b.factorLENGTH_PLOT_Gen,
                 MO2_b.factorLENGTH_PLOT_pCO2,
@@ -1172,7 +1172,7 @@ Length_RR_b.factor_LowVMod <- RR_master_OM %>%
                                                                  "F2 x moderate pCO2"))
 Length_RR_b.factor_LowVMod_facetted  <- Length_RR_b.factor_LowVMod + facet_wrap(~Gen)
 
-pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/Respiration/metabolic_scaling/F1_F2_RR_bFactor_Length_LowvMod.pdf"), 
+pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/Respiration/metabolic_scaling/F1_F2_RR_bFactor_Length_LowvMod.pdf"), 
     width = 5, height = 10)
 print(ggpubr::ggarrange(Length_RR_b.factor_LowVMod,
                         Length_RR_b.factor_LowVMod_facetted, nrow = 2, ncol = 1)) # print the model diagnostics
@@ -1209,7 +1209,7 @@ F2_Length_RR_b.factor_LowVHigh <- RR_master_OM %>%
                               ggtitle("Allometric scaling: log10_VO2 = log10_a + (b.factor * log10_Length)") 
 
 
-pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/Respiration/metabolic_scaling/F2_RR_bFactor_Length_LowvHigh.pdf"), 
+pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/Respiration/metabolic_scaling/F2_RR_bFactor_Length_LowvHigh.pdf"), 
     width = 5, height = 5)
 print(F2_Length_RR_b.factor_LowVHigh) # print the model diagnostics
 dev.off() 
@@ -1222,17 +1222,17 @@ dev.off()
 
 -   Length b factor total = 2.16 
 Generation
--   Length b factor pCO2 F1 = 2.3
+-   Length b factor pCO2 F1 = 2.36
 -   Length b factor pCO2 F2 = 1.74 
 -   Length b factor pCO2 F3 = 8.38
 Treatment
--   Length b factor pCO2 low = 2.21
--   Length b factor pCO2 moderate = 2.05
+-   Length b factor pCO2 low = 2.23
+-   Length b factor pCO2 moderate = 2.06
 -   Length b factor pCO2 high = 2.5
 Generation * Treatment
 F1
--   Length b factor pCO2 low = 2.34
--   Length b factor pCO2 moderate = 2.25
+-   Length b factor pCO2 low = 2.4
+-   Length b factor pCO2 moderate = 2.31
 F2
 -   Length b factor pCO2 low = 1.8 (Note we have 3.4 when truncating to data to compare to high OA OTHER PAPER LOOKING AT LOW V HIGH F2)
 -   Length b factor pCO2 moderate = 1.71 
@@ -1249,15 +1249,15 @@ F3
 ```{r, RR_formatted_F1smaster}
 
 # call all bfactors (calc above!) - these are using all data
-bTDW = 0.724 # review the outlier-omitted b factor plot in previous chunk
-bLength.all = 2.3 # review the outlier-omitted b factor plot in previous chunk
+bTDW = 0.903 # review the outlier-omitted b factor plot in previous chunk
+bLength.all = 2.36 # review the outlier-omitted b factor plot in previous chunk
 
 # assign bfactors by treatment
-bTDW.low <-  0.732 #mean data by rep tank # 6.99 - with all data
-bTDW.mod <-  0.710 #mean data by rep tank # 6.57 - with all data
+bTDW.low <-  0.928 #mean data by rep tank # 6.99 - with all data
+bTDW.mod <-  0.813 #mean data by rep tank # 6.57 - with all data
 
-bLength.low <-  2.34 #mean data by rep tank # 6.99 - with all data
-bLength.mod <-  2.25 #mean data by rep tank # 6.57 - with all data
+bLength.low <-  2.4 #mean data by rep tank # 6.99 - with all data
+bLength.mod <-  2.31 #mean data by rep tank # 6.57 - with all data
 
 # call the mean lengths of animals measured
 RR_master_F1$Dry_Tissue_weight <- as.numeric(RR_master_F1$Dry_Tissue_weight)
@@ -1348,8 +1348,8 @@ RR_formatted_F1smaster <- RR_master_F1 %>%
 
                                               resp_umol_hr_bFactorNormLength.MEAN))
 #View(RR_formatted_F1smaster)
-write.csv(RR_formatted_F1smaster, "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/Respiration/F1/F1_RR_calc_master.csv")
-write.csv(RR_formatted_F1smaster, "C:/Users/samuel.gurr/Documents/Github_repositories/EAD-ASEB-Airradians_multigen_OA/RAnalysis/Output/Respiration/F1/F1_RR_calc_master.csv")
+write.csv(RR_formatted_F1smaster, "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/Respiration/F1/F1_RR_calc_master.csv")
+# write.csv(RR_formatted_F1smaster, "C:/Users/samuel.gurr/Documents/Github_repositories/EAD-ASEB-Airradians_multigen_OA/RAnalysis/Output/Respiration/F1/F1_RR_calc_master.csv")
 
 ```
 
@@ -1537,7 +1537,7 @@ RR_formatted_F2smaster <- RR_master_F2 %>%
                                               resp_umol_hr_bFactorNormLength.MEAN_LvM,
                                               resp_umol_hr_bFactorNormLength.MEAN_LvH))
 #View(RR_formatted_F1smaster)
-write.csv(RR_formatted_F2smaster, "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/Respiration/F2/F2_RR_calc_master.csv")
+write.csv(RR_formatted_F2smaster, "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/Respiration/F2/F2_RR_calc_master.csv")
 write.csv(RR_formatted_F2smaster, "C:/Users/samuel.gurr/Documents/Github_repositories/EAD-ASEB-Airradians_multigen_OA/RAnalysis/Output/Respiration/F2/F2_RR_calc_master.csv")
 
 ```
@@ -1625,6 +1625,6 @@ RR_formatted_F3smaster <- RR_master_F3 %>%
                                             resp_umol_hr_bFactorNormTDW.1g,
                                             resp_umol_hr_bFactorNormLength.MEAN))
 #View(RR_formatted_F1smaster)
-write.csv(RR_formatted_F3smaster, "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/Respiration/F3/F3_RR_calc_master.csv")
+write.csv(RR_formatted_F3smaster, "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/Respiration/F3/F3_RR_calc_master.csv")
 ```
 

@@ -289,6 +289,9 @@ Proportion_master <- F1_dryweights_calc.long %>%
                                                                       Proportion_Adductor + 
                                                                        Proportion_Somatic)) 
 
+
+write.csv(Proportion_master, "C:/Users/samjg/Documents/test.csv")
+
 ```
 
 ### Plot porportion dataset
