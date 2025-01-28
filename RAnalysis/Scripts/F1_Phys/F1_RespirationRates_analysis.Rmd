@@ -28,7 +28,7 @@ library(SciViews)
 library(lubridate)
 
 # SET WORKING DIRECTORY :::::::::::::::::::::::::::::::::::::::::::::::
-knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis")
+knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis")
 
 ```
 
@@ -45,7 +45,7 @@ F1_RR_Length_Meanbytank <- RR_formatted_F1s%>%
                                       groupvars=c("Date", "Age", "pCO2", "Chamber_tank"))
 unique(F1_RR_Length_Meanbytank$Date) # "10/26/2021" "10/26/2022" "2/2/2022"   "3/1/2022"   "9/14/2021"  "9/22/2022"  "9/30/2021"
 
-write.csv(F1_RR_Length_Meanbytank, "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/Respiration/F1/F1_Mean_RRLength_by_tank.csv")
+write.csv(F1_RR_Length_Meanbytank, "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/Respiration/F1/F1_Mean_RRLength_by_tank.csv")
 
 # length b factor norm
 F1_RR_TDW_Meanbytank <- RR_formatted_F1s%>% 
@@ -54,7 +54,7 @@ F1_RR_TDW_Meanbytank <- RR_formatted_F1s%>%
                             filter(!is.na(resp_umol_hr_bFactorNormTDW.MEAN))
 unique(F1_RR_TDW_Meanbytank$Date)  # "10/26/2021" "10/26/2022" "2/2/2022"   "3/1/2022"   "9/22/2022"                         
 
-write.csv(F1_RR_TDW_Meanbytank, "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/Respiration/F1/F1_Mean_RRTDW_by_tank.csv")
+write.csv(F1_RR_TDW_Meanbytank, "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/Respiration/F1/F1_Mean_RRTDW_by_tank.csv")
 
 
 ```
@@ -149,16 +149,16 @@ F1_RR_Length_MeanSE_sub <-  F1_RR_Length_Means %>% # matches the timepoints for 
                                     theme(text = element_text(size=10))
 
 # save
-pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/Respiration/F1/F1_RR_LENGTH_bfactor.pdf"), width = 8, height = 4)
+pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/Respiration/F1/F1_RR_LENGTH_bfactor.pdf"), width = 8, height = 4)
 print(ggarrange(F1s.BOXPLOT_Length_bfactor.MEAN, F1_RR_Length_MeanSE, ncol = 2)) # print the model diagnostics 
 dev.off()
 
-pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/Respiration/F1/F1_RR_LENGTH_bfactor_meanSE.pdf"), width = 4, height =4)
+pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/Respiration/F1/F1_RR_LENGTH_bfactor_meanSE.pdf"), width = 4, height =4)
 print(F1_RR_Length_MeanSE) # print the model diagnostics 
 dev.off()
 
 
-pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/Respiration/F1/F1_RR_LENGTH_bfactor_meanSEsubset.pdf"), width = 4, height = 4)
+pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/Respiration/F1/F1_RR_LENGTH_bfactor_meanSEsubset.pdf"), width = 4, height = 4)
 print(F1_RR_Length_MeanSE_sub) # print the model diagnostics 
 dev.off()
 ```
@@ -233,7 +233,7 @@ for (i in 1:nrow(ANOVA_Dates)) {
 
 
 # WRITE CSV OF THE MASTER FILE
-write.csv( (AOVdf_total %>% dplyr::arrange(Age)), "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/Respiration/F1/F1_RR_LENGTH_Statistics.csv")
+write.csv( (AOVdf_total %>% dplyr::arrange(Age)), "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/Respiration/F1/F1_RR_LENGTH_Statistics.csv")
 #write.csv(Biodep_Master, "C:/Users/samuel.gurr/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/Biodeposition/Biodeposition_master.csv")
                     
 
@@ -328,7 +328,7 @@ for (i in 1:nrow(Ttest_Dates)) {
 Ttest_total$Bonferroni_cor <- p.adjust(Ttest_total$P_val, method = "bonferroni")
 
 # write table
-write.csv( (Ttest_total %>% dplyr::arrange(Age)), "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/Respiration/F1/F1_RR_LENGTH_Ttests.csv")
+write.csv( (Ttest_total %>% dplyr::arrange(Age)), "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/Respiration/F1/F1_RR_LENGTH_Ttests.csv")
 
 ```
 
@@ -399,7 +399,7 @@ F1_RR_TDW_MeanSE <-  F1_RR_TDW_Means %>%
 
 
 # save
-pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/Respiration/F1/F1_RR_TDW_bfactor.pdf"), width = 6, height = 8)
+pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/Respiration/F1/F1_RR_TDW_bfactor.pdf"), width = 6, height = 8)
 print(ggarrange(F1s.BOXPLOT_TDW_bfactor.MEAN, F1_RR_TDW_MeanSE, nrow = 2)) # print the model diagnostics 
 dev.off()
 

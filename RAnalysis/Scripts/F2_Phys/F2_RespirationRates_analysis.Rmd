@@ -28,7 +28,7 @@ library(SciViews)
 library(lubridate)
 
 # SET WORKING DIRECTORY :::::::::::::::::::::::::::::::::::::::::::::::
-knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis")
+knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis")
 
 ```
 
@@ -61,10 +61,10 @@ F2_RR_Length_Meanbytank_LvH     <- RR_formatted_F2s %>%
 unique(F2_RR_Length_Meanbytank_LvH$Date)  # "1/31/2023"  "11/16/2022" "2/23/2023"  "3/27/2023"  "8/30/2022"                     
 
 
-write.csv(F2_RR_Length_Meanbytank_LvM, "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/Respiration/F2/F2_Mean_RRLength_by_tank_LvM.csv")
+write.csv(F2_RR_Length_Meanbytank_LvM, "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/Respiration/F2/F2_Mean_RRLength_by_tank_LvM.csv")
 
 
-write.csv(F2_RR_Length_Meanbytank_LvH, "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/Respiration/F2/F2_Mean_RRLength_by_tank_LvH.csv")
+write.csv(F2_RR_Length_Meanbytank_LvH, "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/Respiration/F2/F2_Mean_RRLength_by_tank_LvH.csv")
 
 
 # length b factor norm
@@ -81,9 +81,9 @@ F2_RR_TDW_Meanbytank_LvH <- RR_formatted_F2s%>%
                             filter(!is.na(resp_umol_hr_bFactorNormLength.MEAN_LvH))
 unique(F2_RR_TDW_Meanbytank_LvH$Date)  # "1/31/2023"  "11/16/2022" "2/23/2023"  "3/27/2023"  "8/30/2022"  "9/22/2022" 
 
-write.csv(F2_RR_TDW_Meanbytank_LvM, "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/Respiration/F2/F2_Mean_RRTDW_by_tank_LvM.csv")
+write.csv(F2_RR_TDW_Meanbytank_LvM, "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/Respiration/F2/F2_Mean_RRTDW_by_tank_LvM.csv")
 
-write.csv(F2_RR_TDW_Meanbytank_LvH, "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/Respiration/F2/F2_Mean_RRTDW_by_tank_LvH.csv")
+write.csv(F2_RR_TDW_Meanbytank_LvH, "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/Respiration/F2/F2_Mean_RRTDW_by_tank_LvH.csv")
 
 
 # NOTE: the spat on 9/22/2022 are F2s measured witht heSDR dish and do not have a replicate ID (neither replicate nor chamber tank)
@@ -164,12 +164,12 @@ F2_RR_Length_MeanSE_LvM <-  F2_RR_Length_Means_LvM %>%
 
 
 # save
-pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/Respiration/F2/F2_RR_LENGTH_bfactor_LowvMod.pdf"), width = 8, height = 4)
+pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/Respiration/F2/F2_RR_LENGTH_bfactor_LowvMod.pdf"), width = 8, height = 4)
 print(ggarrange(F2s.BOXPLOT_Length_bfactor.MEAN_LvM, F2_RR_Length_MeanSE_LvM, ncol = 2)) # print the model diagnostics 
 dev.off()
 
 
-pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/Respiration/F2/F2_RR_LENGTH_bfactor_meanSE_LowvMod.pdf"), width = 4, height = 4)
+pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/Respiration/F2/F2_RR_LENGTH_bfactor_meanSE_LowvMod.pdf"), width = 4, height = 4)
 print(ggarrange(F2_RR_Length_MeanSE_LvM)) # print the model diagnostics 
 dev.off()
 
@@ -244,12 +244,12 @@ F2_RR_Length_MeanSE_LvH <-  F2_RR_Length_Means_LvH %>%
 
 
 # save
-pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/Respiration/F2/F2_RR_LENGTH_bfactor_LowvHigh.pdf"), width = 8, height = 4)
+pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/Respiration/F2/F2_RR_LENGTH_bfactor_LowvHigh.pdf"), width = 8, height = 4)
 print(ggarrange(F2s.BOXPLOT_Length_bfactor.MEAN_LvH, F2_RR_Length_MeanSE_LvH, ncol = 2)) # print the model diagnostics 
 dev.off()
 
 
-pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/Respiration/F2/F2_RR_LENGTH_bfactor_meanSE_LowvHigh.pdf"), width = 4, height = 4)
+pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/Respiration/F2/F2_RR_LENGTH_bfactor_meanSE_LowvHigh.pdf"), width = 4, height = 4)
 print(ggarrange(F2_RR_Length_MeanSE_LvH)) # print the model diagnostics 
 dev.off()
 
@@ -358,7 +358,7 @@ for (i in 1:nrow(Ttest_Dates)) {
 Ttest_total$Bonferroni_cor <- p.adjust(Ttest_total$P_val, method = "bonferroni")
 
 # write table
-write.csv( (Ttest_total %>% dplyr::arrange(Age)), "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/Respiration/F2/F2_RR_LENGTH_Ttests_LowvMod.csv")
+write.csv( (Ttest_total %>% dplyr::arrange(Age)), "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/Respiration/F2/F2_RR_LENGTH_Ttests_LowvMod.csv")
 
 ```
 
@@ -459,7 +459,7 @@ for (i in 1:4) { # 1-4 to not run row 5 "8/30/2022" this is at 133 dpf dp not ru
 Ttest_total$Bonferroni_cor <- p.adjust(Ttest_total$P_val, method = "bonferroni")
 
 # write table
-write.csv( (Ttest_total %>% dplyr::arrange(Age)), "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/Respiration/F2/F2_RR_LENGTH_Ttests_LowvHigh.csv")
+write.csv( (Ttest_total %>% dplyr::arrange(Age)), "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/Respiration/F2/F2_RR_LENGTH_Ttests_LowvHigh.csv")
 
 ```
 
