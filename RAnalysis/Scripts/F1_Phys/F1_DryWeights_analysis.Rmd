@@ -30,7 +30,8 @@ library(Rmisc)
 library(ggpmisc)
 library(tidyr)
 # SET WORKING DIRECTORY :::::::::::::::::::::::::::::::::::::::::::::::
-knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis")
+# knitr::opts_knit$set(root.dir = "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis")
+knitr::opts_knit$set(root.dir = "C:/Users/samuel.gurr/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis")
 
 ```
 
@@ -84,6 +85,8 @@ F1_dryweights_calc <- F1_dryweights %>%
                             AMSSI = ( ((Dry_Adductor_Tissue_g-Ash_Inorganic_.Adductor_Tissue_g)+
                                          (Dry_Somatic_Tissue_g-Ash_Inorganic_.Somatic_Tissue_g))/Tissue_AFDW_g) *100)
 # View(F1_dryweights_calc)
+
+# View(F1_dryweights_calc %>% dplyr::filter(Date_sampled %in% '3/16/2022'))
 ```
 
 
@@ -128,7 +131,7 @@ F1_dryweights_calc.long <- F1_dryweights_calc %>%
                                     na.omit()
 
 ## step 1 calc means by replicate tank 
-
+View(F1_dryweights_calc.long %>% dplyr::filter(Age == 233 & measurement %in% 'Dry_Gonad_weight_g' & pCO2  %in% '500 μatm'))
 
 F1_dryweights_calc.long.MEANS    <- F1_dryweights_calc.long %>% 
                                     summarySE(measurevar="value", 
@@ -155,9 +158,6 @@ F1_dryweights_calc.long.MEANS_master <- F1_dryweights_calc.long.MEANS %>%  # noe
                         dplyr::select(-c(sd, se, ci)) # N = number of means!!! N = 2 means there awas a A+E, etc and mean == median
 
 ```
-
-
-
 
 
 ```{r all diagnostic plotting}
@@ -262,7 +262,6 @@ dev.off()
 ```
 
 
-
 # Proportion Gonad to Total tissue weight 
 
 * here we do no require a bfactor becuase we are already scalling to the individual!
@@ -281,17 +280,29 @@ Proportion_master <- F1_dryweights_calc.long %>%
                                                 names_from = measurement,
                                                 values_from = value
                             ) %>% 
-                            na.omit() %>% # omit cases where we do not have gonad weight (there are a few!)
+                            # na.omit() %>% # omit cases where we do not have gonad weight (there are a few!)
                             dplyr::mutate(Proportion_Gonad    = Dry_Gonad_weight_g/Total_Dry_Tissue_g,
                                           Proportion_Adductor = Dry_Adductor_Tissue_g/Total_Dry_Tissue_g,
                                           Proportion_Somatic  = Dry_Somatic_Tissue_g/Total_Dry_Tissue_g,
                                           Sanity_check_prop_total = (Proportion_Gonad +  
                                                                       Proportion_Adductor + 
-                                                                       Proportion_Somatic)) 
+                                                                       Proportion_Somatic)) %>% 
+                            dplyr::mutate(Tank_Replicate = case_when(
+                                      Tank_Replicate == 'E' ~ 'A', #convert E to A
+                                      Tank_Replicate == 'F' ~ 'B', #convert F to B
+                                      Tank_Replicate == 'G' ~ 'C', #convert G to C
+                                      Tank_Replicate == 'H' ~ 'D', #convert H to D
+                                      .default = (as.character(Tank_Replicate)) # for cases A-D, keep em my mans
+                                    )) 
 
+<<<<<<< HEAD
 
 write.csv(Proportion_master, "C:/Users/samjg/Documents/test.csv")
 
+=======
+?summarySE
+Proportion_master %>% Rmisc::summarySE(groupvars = c('Age', 'pCO2', 'Tank_Replicate'), measurevar = 'Proportion_Gonad')
+>>>>>>> cc8468a583618b77344f2f5c28b919c0f7fab5c4
 ```
 
 ### Plot porportion dataset
@@ -331,19 +342,25 @@ Proportion_master_long_MEANS$prop_metric <- as.character(Proportion_master_long_
 
 
 Proportion_StackedBarplot <- Proportion_master_long_MEANS %>% 
-  ggplot(aes(x = as.factor(Age), 
-             y = mean, 
-             fill = prop_metric)) + 
-  geom_bar(stat = "identity", width=0.7) + 
-  scale_fill_manual(values = c("grey80","grey40", "grey20")) +
-  #scale_fill_manual(values = c("#0072B2", "#D55E00")) + # colorblindness palette blue and orange
-  geom_errorbar(aes(ymax = y_pos + sd, ymin=y_pos - sd), stat = "identity", width = 0.1, alpha = 0.7, position = pd) + 
-  facet_wrap(~pCO2) + 
-  scale_alpha_manual(values=c(seq(0.3,1, length.out = 3))) + 
-  theme_bw() + 
-  scale_y_continuous(breaks = seq(from = 0, to = 100, by = 10)) + 
-  ylim(0,1.1)+
-  ylab("Dry Tissue Proportions (%)") 
+                                drop_na(mean) %>% 
+                                ggplot(aes(x = as.factor(Age), 
+                                           y = mean, 
+                                           fill = prop_metric)) + 
+                                geom_bar(stat = "identity", width=0.7) + 
+                                scale_fill_manual(values = c("grey80","grey40", "grey20")) +
+                                #scale_fill_manual(values = c("#0072B2", "#D55E00")) + # colorblindness palette blue and orange
+                                geom_errorbar(aes(ymax = y_pos + sd, 
+                                                  ymin=y_pos - sd), 
+                                              stat = "identity", 
+                                              width = 0.1, 
+                                              alpha = 0.7, 
+                                              position = pd) + 
+                                facet_wrap(~pCO2) + 
+                                scale_alpha_manual(values=c(seq(0.3,1, length.out = 3))) + 
+                                theme_bw() + 
+                                scale_y_continuous(breaks = seq(from = 0, to = 100, by = 10)) + 
+                                ylim(0,1.1)+
+                                ylab("Dry Tissue Proportions (%)") 
 Proportion_StackedBarplot
 
 
