@@ -16,14 +16,14 @@ library(ggpmisc)
 
 # SET WORKING DIRECTORY 
 setwd("C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis") # personal computer
-setwd("C:/Users/samuel.gurr/Documents/Github_repositories/EAD-ASEB-Airradians_multigen_OA/RAnalysis") # personal computer
+setwd("C:/Users/samuel.gurr/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis") # personal computer
 
 
 
 # LOAD DATA & cater to this script 
 
 # Extretion data 
-ER_F1_raw <- read.csv(file="Data/Physiology/Excretion_rates/F1/cumultative_raw/F1_Excretion_master.csv", 
+ER_F1_raw <- read.csv(file="Data/Physiology/Excretion_rates/F1/cumultative_raw/F1_Excretion_master_20250305.csv", 
                       header=T,stringsAsFactors=FALSE, fileEncoding="latin1") %>% # master data file
                       dplyr::mutate(Generation = 'F1')
 ER_F2_raw <- read.csv(file="Data/Physiology/Excretion_rates/F2/cumultative_raw/F2_Excretion_master.csv", 
@@ -168,6 +168,8 @@ TDW_ER_b.factor_LowVMod_facetted  <- TDW_ER_b.factor_LowVMod + facet_wrap(~Gener
 
 pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/ExcretionRates/allometric_scaling/F1_F2_ER_bFactor_TDW_LowvMod.pdf"), 
     width = 5, height = 10)
+pdf(paste0(filename = "C:/Users/samuel.gurr/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/ExcretionRates/allometric_scaling/F1_F2_ER_bFactor_TDW_LowvMod.pdf"), 
+    width = 5, height = 10)
 print(ggpubr::ggarrange(TDW_ER_b.factor_LowVMod,
                         TDW_ER_b.factor_LowVMod_facetted, nrow = 2, ncol = 1)) # print the model diagnostics
 dev.off() 
@@ -210,6 +212,8 @@ TDW_ER_b.factor_LowVMHigh <- Excretion_data_OM %>%
 
 pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/ExcretionRates/allometric_scaling/F2_ER_bFactor_TDW_LowvHigh.pdf"), 
     width = 5, height = 5)
+pdf(paste0(filename = "C:/Users/samuel.gurr/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/ExcretionRates/allometric_scaling/F2_ER_bFactor_TDW_LowvHigh.pdf"), 
+    width = 5, height = 5)
 print(TDW_ER_b.factor_LowVMHigh) # print the model diagnostics
 dev.off() 
 
@@ -250,6 +254,8 @@ Length_ER_b.factor_LowVMod <- Excretion_data_OM %>%
 Length_ER_b.factor_LowVMod_facetted <- Length_ER_b.factor_LowVMod + facet_wrap(~Generation)
 
 pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/ExcretionRates/allometric_scaling/F1_F2_ER_bFactor_Length_LowvMod.pdf"), 
+    width = 5, height = 10)
+pdf(paste0(filename = "C:/Users/samuel.gurr/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/ExcretionRates/allometric_scaling/F1_F2_ER_bFactor_Length_LowvMod.pdf"), 
     width = 5, height = 10)
 print(ggpubr::ggarrange(Length_ER_b.factor_LowVMod,
                         Length_ER_b.factor_LowVMod_facetted, nrow = 2, ncol = 1)) # print the model diagnostics
@@ -292,6 +298,8 @@ Length_ER_b.factor_LowVMHigh <- Excretion_data_OM %>%
                                      "F2 x high pCO2"))
 
 pdf(paste0(filename = "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/ExcretionRates/allometric_scaling/F2_ER_bFactor_Length_LowvHigh.pdf"), 
+    width = 5, height = 5)
+pdf(paste0(filename = "C:/Users/samuel.gurr/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/ExcretionRates/allometric_scaling/F2_ER_bFactor_Length_LowvHigh.pdf"), 
     width = 5, height = 5)
 print(Length_ER_b.factor_LowVMHigh) # print the model diagnostics
 dev.off() 
@@ -379,19 +387,19 @@ ER_b.factorTDW_PLOT_pCO2 <- Excretion_data_F1 %>% # 1.26 and 1.32
 
 
 
-# F1 Low: 4.32
-# F1 Moderate 4.57
+# F1 Low: 3.55
+# F1 Moderate 3.11
 
 
 
 # F1 
 
 # assign bfactors by treatment
-F1_bLength.low <-  4.32 #mean data by rep tank # 6.99 - with all data
-F1_bLength.mod <-  4.57 #mean data by rep tank # 6.57 - with all data
+F1_bLength.low <-  3.55 
+F1_bLength.mod <-  3.11 
 
-F1_bTDW.low <-  1.26 #mean data by rep tank # 6.99 - with all data
-F1_bTDW.mod <-  1.32 #mean data by rep tank # 6.57 - with all data
+F1_bTDW.low <-  0.995 #mean data by rep tank # 6.99 - with all data
+F1_bTDW.mod <-  0.892 #mean data by rep tank # 6.57 - with all data
 
 
 # call the mean lengths of animals measured
@@ -429,8 +437,8 @@ Excretion_F1_calculated <- Excretion_data_F1 %>%
                     ExcretionRate_umol_hr_bFactorNormLength.MEAN,
                     ExcretionRate_umol_hr_bFactorNormTDW.MEAN))
 #View(RR_formatted_F1smaster)
-write.csv(Excretion_F1_calculated, "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/ExcretionRates/F1/F1_ExcretionRates_master.csv")
-write.csv(Excretion_F1_calculated, "C:/Users/samuel.gurr/Documents/Github_repositories/EAD-ASEB-Airradians_multigen_OA/RAnalysis/Output/ExcretionRates/F1/F1_ExcretionRates_master.csv")
+write.csv(Excretion_F1_calculated, "C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/ExcretionRates/F1/F1_ExcretionRates_master.csv")
+write.csv(Excretion_F1_calculated, "C:/Users/samuel.gurr/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/ExcretionRates/F1/F1_ExcretionRates_master.csv")
 
 
 

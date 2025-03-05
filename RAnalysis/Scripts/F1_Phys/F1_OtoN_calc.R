@@ -14,7 +14,8 @@ library(stringr)
 library(ggplot2)
 
 # SET WORKING DIRECTORY :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-setwd("C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis")
+setwd("C:/Users/samjg/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis")
+setwd("C:/Users/samuel.gurr/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis")
 
 
 # LOAD DATA ::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -62,26 +63,29 @@ nrow(SMR_F1_sub) # 77 - we have one value less than ER due to a bad datapoint
 
 
 ER_F1_sub <- ER_F1 %>% dplyr::select(c('Date', 'Age', 'pCO2','Replicate',
-                                       'Number', 'Run','Length_mm',
+                                       'Number', 'Run','Length_mm', 'Dry_Tissue_weight',
                                        'ExcretionRate_umol_hr'))
 # now when we merge, ER is our limiting factor 
-F1_ON_Merge<- merge(ER_F1_sub, SMR_F1_sub, by=c('Date','Age', 'pCO2',  'Replicate','Number', 'Run'))
+F1_ON_Merge<- merge(ER_F1_sub, SMR_F1_sub, by=c('Date','Age', 'pCO2',  'Replicate','Number', 'Run', 'Length_mm'))
 nrow(F1_ON_Merge) # 74 aligned - 4 less than ER master file 
 
 # F1 Plots ::::::::::::::::::::::::::
 library(forcats)
 F1_ON_Master <- F1_ON_Merge %>% 
+                  dplyr::mutate(resp_umol_hr = signif(resp_umol_hr, digits = 3)) %>% 
                   # IMPORTANT! out resp_mg_hr  is in O2 - we cover to resp_umol_hr by divideding by 32 (atomic weight of O2! 
                   # so technically our umol is the atomic equivelnts of O2, not O, to get this we mutliply by 2
-                  dplyr::mutate(O_N = (resp_umol_hr)*2 / # for umol of oxygen, curretnly as O2, convert to O 
-                                  ExcretionRate_umol_hr) %>% 
+                  dplyr::mutate(O_N = signif(
+                                  ((resp_umol_hr)*2 / # for umol of oxygen, curretnly as O2, convert to O 
+                                  ExcretionRate_umol_hr), digits = 3)) %>% 
                   # dplyr::filter(!O_N >200) %>% # outlier omit
-                  dplyr::mutate(pCO2 = factor(pCO2, levels=c("500 μatm", "800 μatm")))
+                  dplyr::mutate(pCO2 = factor(pCO2, levels=c("500 μatm", "800 μatm"))) %>% 
+                  dplyr::arrange(Date, Run, pCO2, Replicate)
 
 # View(F1_ON_Master %>% dplyr::select(Date,pH, Replicate,resp_umol_hr, ExcretionRate_umol_hr, O_N))
 
 write.csv(F1_ON_Master,
-          "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/OxygenNitrogen_ratio/F1/F1_ON_master.csv")
+          "C:/Users/samuel.gurr/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/OxygenNitrogen_ratio/F1/F1_ON_master.csv")
 
 
 F1_ON_MasterMEANS <- F1_ON_Master %>% # mean by tank replicate 
@@ -91,7 +95,7 @@ F1_ON_MasterMEANS <- F1_ON_Master %>% # mean by tank replicate
                                   groupvars=c("Date", "Age", "pCO2",  "Replicate"))
 
 write.csv(F1_ON_MasterMEANS,
-          "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/OxygenNitrogen_ratio/F1/F1_ON_master_means.csv")
+          "C:/Users/samuel.gurr/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/OxygenNitrogen_ratio/F1/F1_ON_master_means.csv")
 
 
 F1_Boxplot <- F1_ON_MasterMEANS %>% 
@@ -153,7 +157,7 @@ F1_ON_Plot <- F1_ON_MasterMEANSMEANS %>%
 library(ggpubr)
 ggarrange(F1_Boxplot, F1_ON_Plot, ncol = 1)
 
-pdf(paste0("C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/OxygenNitrogen_ratio/F1/F1_ON_Mean_SE.pdf"), width = 4, height = 4)
+pdf(paste0("C:/Users/samuel.gurr/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/OxygenNitrogen_ratio/F1/F1_ON_Mean_SE.pdf"), width = 4, height = 4)
 print(F1_ON_Plot)
 dev.off()
 
@@ -221,7 +225,7 @@ for (i in 1:nrow(ANOVA_Dates)) {
 
 
 # WRITE CSV OF THE MASTER FILE
-write.csv(AOVdf_total, "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/OxygenNitrogen_ratio/F1/F1_OtoN_ANOVA.csv")
+write.csv(AOVdf_total, "C:/Users/samuel.gurr/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/OxygenNitrogen_ratio/F1/F1_OtoN_ANOVA.csv")
 #write.csv(Biodep_Master, "C:/Users/samuel.gurr/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/Biodeposition/Biodeposition_master.csv")
 
 
@@ -230,7 +234,9 @@ write.csv(AOVdf_total, "C:/Users/samjg/Documents/Github_repositories/Airradians_
 
 
 # T-tests
-
+library(purrr)
+library(broom)
+?tidy
 Ttest_Dates       <- as.data.frame(unique(F1_ON_MasterMEANS$Date)) # call a list to loop in 
 Ttest_total       <- data.frame() # start dataframe, this will be the master output
 DF_loop           <- data.frame(matrix(nrow = 1, ncol = 13)) # create dataframe to save during for loop
@@ -315,4 +321,4 @@ for (i in 1:nrow(Ttest_Dates)) {
 }
 # View(AOVdf_total) # view all the anova tests within data 
 
-write.csv(Ttest_total, "C:/Users/samjg/Documents/Github_repositories/Airradians_multigen_OA/RAnalysis/Output/OxygenNitrogen_ratio/F1/F1_OtoN_Ttest.csv")
+write.csv(Ttest_total, "C:/Users/samuel.gurr/Documents/Github_repositories/EAD-ASEB-Airradians_F1F2_Growout_OA/RAnalysis/Output/OxygenNitrogen_ratio/F1/F1_OtoN_Ttest.csv")
